@@ -6,6 +6,9 @@ var lightManager, dungeon;
 var clock = new THREE.Clock();
 var cache = new Cache();
 var passes = {};
+var sounds = {
+	shoot: new Audio("assets/sounds/fork-launch.wav")
+};
 
 function init() {
 	scene = new Physijs.Scene();
@@ -108,6 +111,9 @@ function mouseHandler(button) {
 	var projector = new THREE.Projector();
 	projector.unprojectVector(_vector, pl.camera);
 	if (button == 0 && pl.rhand) {
+		if (window.chrome) sounds.shoot.load(); // Chrome requires reload
+		else sounds.shoot.currentTime = 0;
+		sounds.shoot.play();
 		var fork = dungeon.forks[dungeon.forkIndex];
 		dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
 		fork.position.copy(pl.position);
@@ -119,7 +125,6 @@ function mouseHandler(button) {
 		fork.__dirtyPosition = true;
 		fork.__dirtyRotation = true;
 		_vector.subSelf(pl.camera.position).normalize();
-		console.log(_vector.x, _vector.y, _vector.z);
 		fork.setLinearVelocity(_vector.multiplyScalar(25.0));
 		fork.visible = true;
 	} else if (button == 2) {
