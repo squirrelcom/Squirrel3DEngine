@@ -1,10 +1,10 @@
 {
-	"name": "darkcorners",
+	"name": "plasmaforks",
 	"main": "game.html",
 	"description": "A 3d game",
 	"nodejs": false,
 	"window": {
-		"title": "Dark Corners",
+		"title": "Plasma Forks",
 		"toolbar": false,
 		"width": 1024,
 		"height": 768

@@ -1,10 +1,7 @@
-Dark Corners
+Plasma Forks
 ============
 
-This is 3d first person game prototype with a level editor.
-The main design guideline is sacrificing artistic liberties for quickness of content creation.
-See http://tapio.github.com/darkcorners/ for more information and demo.
-
+This is a small 3d first-person shooter for the web.
 
 System Requirements
 -------------------
