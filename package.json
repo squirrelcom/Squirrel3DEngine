@@ -1,0 +1,13 @@
+{
+	"name": "darkcorners",
+	"main": "game.html",
+	"description": "A 3d game",
+	"nodejs": false,
+	"window": {
+		"title": "Dark Corners",
+		"toolbar": false,
+		"width": 1024,
+		"height": 768
+	}
+}
+
