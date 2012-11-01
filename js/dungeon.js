@@ -441,6 +441,18 @@ function Dungeon(scene, player, levelName) {
 			scene.add(player.rhand);
 		});
 
+		// Bullets
+		cache.loadModel("../assets/items/fork/fork.js", function(geometry) {
+			self.forks = [];
+			self.forkIndex = 0;
+			for (var i = 0; i < 20; ++i) {
+				var fork = new Physijs.BoxMesh(geometry, geometry.materials[0], 10);
+				self.forks.push(fork);
+				fork.visible = false;
+				scene.add(fork);
+			}
+		});
+
 		self.generateMesh(level);
 		self.addLights(level);
 		self.addObjects(level);

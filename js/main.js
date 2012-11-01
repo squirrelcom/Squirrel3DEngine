@@ -107,12 +107,29 @@ function mouseHandler(button) {
 	var _vector = new THREE.Vector3(0, 0, 1);
 	var projector = new THREE.Projector();
 	projector.unprojectVector(_vector, pl.camera);
-	var ray = new THREE.Ray(pl.camera.position, _vector.subSelf(pl.camera.position).normalize());
-	var intersections = ray.intersectObjects(dungeon.objects);
-	if (intersections.length > 0) {
-		var target = intersections[0].object;
-		if (target.position.distanceToSquared(pl.position) < 9)
-			target.applyCentralImpulse(_vector.multiplyScalar(10000));
+	if (button == 0 && pl.rhand) {
+		var fork = dungeon.forks[dungeon.forkIndex];
+		dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
+		fork.position.copy(pl.position);
+		fork.rotation.copy(pl.camera.rotation);
+		fork.updateMatrix();
+		fork.translateX(0.2);
+		fork.translateY(0.4);
+		fork.translateZ(-0.95);
+		fork.__dirtyPosition = true;
+		fork.__dirtyRotation = true;
+		_vector.subSelf(pl.camera.position).normalize();
+		console.log(_vector.x, _vector.y, _vector.z);
+		fork.setLinearVelocity(_vector.multiplyScalar(25.0));
+		fork.visible = true;
+	} else if (button == 2) {
+		var ray = new THREE.Ray(pl.camera.position, _vector.subSelf(pl.camera.position).normalize());
+		var intersections = ray.intersectObjects(dungeon.objects);
+		if (intersections.length > 0) {
+			var target = intersections[0].object;
+			if (target.position.distanceToSquared(pl.position) < 9)
+				target.applyCentralImpulse(_vector.multiplyScalar(10000));
+		}
 	}
 }
 
