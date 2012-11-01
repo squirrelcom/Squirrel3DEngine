@@ -137,6 +137,7 @@ function animate(dt) {
 			if (monster.animation) monster.animation.play();
 			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
 		} else {
+			continue; // FIXME: Temporary
 			// Oh noes, death!
 			controls.active = false;
 			if (!$("#deathscreen").is(':visible'))
@@ -168,12 +169,10 @@ function animate(dt) {
 	if (pl.rhand) {
 		pl.rhand.position.set(pl.position.x, pl.position.y, pl.position.z);
 		pl.rhand.rotation.copy(pl.camera.rotation);
-		pl.rhand.updateMatrix();
-		pl.rhand.rotation.y += Math.PI/3;
-		pl.rhand.rotation.z += Math.PI/2;
-		pl.rhand.translateX(0.2*UNIT);
-		pl.rhand.translateY(0.2*UNIT);
-		pl.rhand.translateZ(-0.5*UNIT);
+		//pl.rhand.updateMatrix();
+		pl.rhand.translateX(0.4);
+		pl.rhand.translateY(0.2);
+		pl.rhand.translateZ(-1.0);
 	}
 
 	// Trigger?

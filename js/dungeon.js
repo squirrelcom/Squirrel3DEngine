@@ -264,7 +264,7 @@ function Dungeon(scene, player, levelName) {
 		}
 
 		// Ambient
-		scene.add(new THREE.AmbientLight(0xaaaaaa));
+		scene.add(new THREE.AmbientLight(0x444444));
 
 		// Point lights
 		var vec = new THREE.Vector2();
@@ -433,6 +433,14 @@ function Dungeon(scene, player, levelName) {
 			controls.setYAngle(level.startAngle);
 		scene.add(pl);
 		pl.setAngularFactor({ x: 0, y: 0, z: 0 });
+
+		// Player gun
+		cache.loadModel("../assets/models/gun/gun.js", function(geometry) {
+			console.log(geometry);
+			player.rhand = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+			player.rhand.position.copy(player.position);
+			scene.add(player.rhand);
+		});
 
 		self.generateMesh(level);
 		self.addLights(level);
