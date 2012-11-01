@@ -435,7 +435,7 @@ function Dungeon(scene, player, levelName) {
 		pl.setAngularFactor({ x: 0, y: 0, z: 0 });
 
 		// Player gun
-		cache.loadModel("../assets/models/gun/gun.js", function(geometry) {
+		cache.loadModel("../assets/items/gun/gun.js", function(geometry) {
 			player.rhand = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
 			player.rhand.position.copy(player.position);
 			scene.add(player.rhand);
