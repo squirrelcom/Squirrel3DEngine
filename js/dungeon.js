@@ -19,15 +19,19 @@ function Dungeon(scene, player, levelName) {
 				scale += randf(-def.randScale, def.randScale);
 				mass *= scale;
 			}
-			if (def.animation) geometry.computeMorphNormals();
+			if (def.animation && def.animation.type === "morph") geometry.computeMorphNormals();
 			if (!geometry.boundingBox) geometry.computeBoundingBox();
 
 			// Handle materials
 			for (var m = 0; m < geometry.materials.length; ++m) {
 				fixAnisotropy(geometry.materials[m]);
 				if (def.animation) {
-					geometry.materials[m].morphTargets = true;
-					geometry.materials[m].morphNormals = true;
+					if (def.animation.type === "morph") {
+						geometry.materials[m].morphTargets = true;
+						geometry.materials[m].morphNormals = true;
+					} else if (def.animation.type === "bones") {
+						geometry.materials[m].skinning = true;
+					}
 				}
 			}
 			var mat = geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0];
@@ -83,15 +87,22 @@ function Dungeon(scene, player, levelName) {
 			// Handle animated meshes
 			if (def.animation) {
 				obj.visible = false;
-				self.monsters.push(obj);
-				obj.mesh = new THREE.MorphAnimMesh(geometry, mat);
-				obj.mesh.duration = def.animation.duration;
-				obj.mesh.time = obj.mesh.duration * Math.random();
+				if (def.animation.type === "morph") {
+					obj.mesh = new THREE.MorphAnimMesh(geometry, mat);
+					obj.mesh.duration = def.animation.duration;
+					obj.mesh.time = obj.mesh.duration * Math.random();
+				} else if (def.animation.type === "bones") {
+					obj.mesh = new THREE.SkinnedMesh(geometry, mat); // TODO: useVertexTexture?
+					THREE.AnimationHandler.add(geometry.animation);
+					obj.animation = new THREE.Animation(obj.mesh, "walk");
+					//obj.animation.play();
+				}
 				if (!def.noShadows) {
 					obj.mesh.castShadow = true;
 					obj.mesh.receiveShadow = true;
 				}
 				obj.add(obj.mesh);
+				self.monsters.push(obj);
 			}
 
 			// Finalize

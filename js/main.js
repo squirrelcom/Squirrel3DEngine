@@ -122,6 +122,7 @@ function animate(dt) {
 	function fract(num) { return num - (num|0); }
 	var i, v = new THREE.Vector3();
 
+	THREE.AnimationHandler.update(dt);
 	for (i = 0; i < dungeon.monsters.length; ++i) {
 		var monster = dungeon.monsters[i];
 		// Look at player
@@ -131,7 +132,9 @@ function animate(dt) {
 		monster.mesh.lookAt(v.normalize());
 		// Move?
 		if (monster.position.distanceToSquared(pl.position) > 4) {
-			monster.mesh.updateAnimation(1000 * dt);
+			if (monster.mesh.updateAnimation)
+				monster.mesh.updateAnimation(dt * 1000);
+			if (monster.animation) monster.animation.play();
 			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
 		} else {
 			// Oh noes, death!
@@ -140,6 +143,7 @@ function animate(dt) {
 				$("#deathscreen").fadeIn(500);
 			$("#instructions").hide();
 			monster.setLinearVelocity(v.set(0,0,0));
+			if (monster.animation) monster.animation.stop();
 		}
 	}
 
