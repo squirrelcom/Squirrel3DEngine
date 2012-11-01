@@ -227,11 +227,11 @@ function Dungeon(scene, player, levelName) {
 		scene.add(mesh);
 
 		// Exit
-		cache.loadModel("assets/models/teleporter/teleporter.js",
-			objectHandler(level, new THREE.Vector3().set(level.exit[0], null, level.exit[1]), 0, assets.objects.teleporter));
-		if (CONFIG.particles)
-			this.exitParticles = createTeleporterParticles(
-				new THREE.Vector3(level.exit[0] * level.gridSize, 0.5, level.exit[1] * level.gridSize));
+		//cache.loadModel("assets/models/teleporter/teleporter.js",
+		//	objectHandler(level, new THREE.Vector3().set(level.exit[0], null, level.exit[1]), 0, assets.objects.teleporter));
+		//if (CONFIG.particles)
+		//	this.exitParticles = createTeleporterParticles(
+		//		new THREE.Vector3(level.exit[0] * level.gridSize, 0.5, level.exit[1] * level.gridSize));
 	};
 
 	this.addLights = function(level) {
@@ -336,11 +336,11 @@ function Dungeon(scene, player, levelName) {
 			lightManager.addShadow(light2);
 
 			// Mesh
-			cache.loadModel(torch, torchHandler(new THREE.Vector3().copy(light.position), snapped.a));
+			//cache.loadModel(torch, torchHandler(new THREE.Vector3().copy(light.position), snapped.a));
 
 			// Flame
-			if (CONFIG.particles)
-				light.emitter = createTexturedFire(light);
+			//if (CONFIG.particles)
+			//	light.emitter = createTexturedFire(light);
 		}
 
 		// Player's torch
