@@ -10,7 +10,7 @@ var assets = {
 	materials: {},
 	monsters: {
 		"robot": {
-			collision: "box",
+			collision: "cylinder",
 			character: { speed: 40 },
 			animation: { type: "morph", duration: "1000" }
 		}
