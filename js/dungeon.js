@@ -105,6 +105,17 @@ function Dungeon(scene, player, levelName) {
 				self.monsters.push(obj);
 			}
 
+			// Character collision callbacks
+			if (def.sound) {
+				obj.addEventListener('collision', function(other, vel, rot) {
+					// TODO: Take velocity into account
+					if (other.damage) {
+						// TODO: Damage
+					}
+					soundManager.play(def.sound);
+				});
+			}
+
 			// Finalize
 			scene.add(obj);
 			if (def.character && def.collision) obj.setAngularFactor({ x: 0, y: 0, z: 0 });
@@ -447,6 +458,7 @@ function Dungeon(scene, player, levelName) {
 			self.forkIndex = 0;
 			for (var i = 0; i < 20; ++i) {
 				var fork = new Physijs.BoxMesh(geometry, geometry.materials[0], 10);
+				fork.damage = 1;
 				self.forks.push(fork);
 				fork.visible = false;
 				scene.add(fork);
@@ -463,7 +475,7 @@ function Dungeon(scene, player, levelName) {
 		self.loaded = true;
 	}
 
-	levelName = levelName || hashParams.level || "cave-test";
+	levelName = levelName || hashParams.level || "test";
 	if (levelName == "rand") {
 		var gen = new MapGen();
 		processLevel(gen.generate());
