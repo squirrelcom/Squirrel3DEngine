@@ -21,7 +21,8 @@ var assets = {
 	},
 	sounds: {
 		"shoot": [ "fork-launch.wav" ],
-		"metal": [ "metal-1.wav", "metal-2.wav", "metal-3.wav" ]
+		"metal": [ "metal-1.wav", "metal-2.wav", "metal-3.wav" ],
+		"robot-death": [ "robot-death.wav" ]
 	},
 	environments: {}
 };

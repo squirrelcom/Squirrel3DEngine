@@ -123,6 +123,7 @@ function Dungeon(scene, player, levelName) {
 						this.hp -= other.damage;
 						// Check for death
 						if (this.hp <= 0) {
+							soundManager.play("robot-death");
 							this.dead = true;
 							if (this.animation) this.animation.stop();
 							this.setAngularFactor({ x: 1, y: 1, z: 1 });

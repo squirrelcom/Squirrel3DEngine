@@ -8,3 +8,8 @@ metal-hit-*:
 	http://opengameart.org/content/metal-and-wood-impact-sound-effects
 	CC-BY-3.0
 
+robot-death.wav:
+	Mike Koenig
+	http://soundbible.com/1295-Dying-Light-Bulb.html
+	CC-BY-3.0
+
