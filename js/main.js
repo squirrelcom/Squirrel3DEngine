@@ -23,6 +23,13 @@ function init() {
 	pl.visible = false;
 	// Add pl later to the scene
 
+	// Player stats
+	pl.health = 100;
+	pl.bulletsPerClip = 15;
+	pl.bullets = pl.bulletsPerClip;
+	pl.clips = 5;
+	updateHUD();
+
 	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1 * UNIT, 30 * UNIT);
 
 	controls = new Controls(pl.camera, { mouse: mouseHandler });
@@ -108,8 +115,19 @@ function mouseHandler(button) {
 	var _vector = new THREE.Vector3(0, 0, 1);
 	var projector = new THREE.Projector();
 	projector.unprojectVector(_vector, pl.camera);
-	if (button == 0 && pl.rhand) {
+	if (button == 0 && pl.rhand && pl.bullets <= 0) {
+		// Clip empty, force reload if there is more
+		if (pl.clips <= 0) {
+			displayMessage("Out of ammo");
+			return;
+		}
+		pl.bullets = pl.bulletsPerClip;
+		--pl.clips;
+		updateHUD();
+	} else if (button == 0 && pl.rhand && pl.bullets > 0) {
+		// Shoot!
 		soundManager.play("shoot");
+		--pl.bullets;
 		var fork = dungeon.forks[dungeon.forkIndex];
 		dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
 		fork.position.copy(pl.position);
@@ -123,7 +141,9 @@ function mouseHandler(button) {
 		_vector.subSelf(pl.camera.position).normalize();
 		fork.setLinearVelocity(_vector.multiplyScalar(25.0));
 		fork.visible = true;
+		updateHUD();
 	} else if (button == 2) {
+		// Punch/push
 		var ray = new THREE.Ray(pl.camera.position, _vector.subSelf(pl.camera.position).normalize());
 		var intersections = ray.intersectObjects(dungeon.objects);
 		if (intersections.length > 0) {

@@ -88,6 +88,12 @@ function initUI() {
 	gui.close();
 }
 
+function updateHUD() {
+	$("#health").html(pl.health);
+	$("#bullets").html(pl.bullets);
+	$("#clips").html(pl.clips);
+}
+
 var messageTimer = null;
 function displayMessage(msg) {
 	if (messageTimer)
