@@ -5,8 +5,9 @@ function Dungeon(scene, player, levelName) {
 	this.objects = [];
 	this.monsters = [];
 	this.anims = [];
-	var dummy_material = new THREE.MeshBasicMaterial({color: 0x000000});
-	var debug_material = new THREE.MeshBasicMaterial({color: 0xff00ff});
+	var dummy_material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+	var debug_material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+	var dead_material = new THREE.MeshLambertMaterial({ color: 0x222222, ambient: 0x222222 });
 
 	function objectHandler(level, pos, ang, def) {
 		return function(geometry) {
@@ -26,6 +27,7 @@ function Dungeon(scene, player, levelName) {
 			// Handle materials
 			for (var m = 0; m < geometry.materials.length; ++m) {
 				fixAnisotropy(geometry.materials[m]);
+				// Handle animation stuff
 				if (def.animation) {
 					if (def.animation.type === "morph") {
 						geometry.materials[m].morphTargets = true;
@@ -115,15 +117,27 @@ function Dungeon(scene, player, levelName) {
 			if (def.sound) {
 				obj.addEventListener('collision', function(other, vel, rot) {
 					if (vel.lengthSq() < 1) return;
+					soundManager.play(def.sound);
+					if (this.dead) return;
 					if (this.hp && other.damage) {
 						this.hp -= other.damage;
-						var mats = this.mesh.geometry.materials;
-						for (var m = 0; m < mats.length; ++m) {
-							mats[m].color.r += 0.05;
-							mats[m].ambient.r += 0.05;
+						// Check for death
+						if (this.hp <= 0) {
+							this.dead = true;
+							if (this.animation) this.animation.stop();
+							this.setAngularFactor({ x: 1, y: 1, z: 1 });
+							this.mass = 2000;
+							this.mesh.material = dead_material;
+						} else {
+							// Hit effect
+							// TODO: Can't do this because the material is shared
+							//var mats = this.mesh.geometry.materials, m;
+							//for (m = 0; m < mats.length; ++m) {
+							//	mats[m].color.r += 0.05;
+							//	mats[m].ambient.r += 0.05;
+							//}
 						}
 					}
-					soundManager.play(def.sound);
 				});
 			}
 

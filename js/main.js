@@ -163,6 +163,7 @@ function animate(dt) {
 	// AI
 	for (i = 0; i < dungeon.monsters.length; ++i) {
 		var monster = dungeon.monsters[i];
+		if (monster.dead) continue;
 		// Look at player
 		v.copy(pl.position);
 		v.subSelf(monster.position);
@@ -184,6 +185,7 @@ function animate(dt) {
 	THREE.AnimationHandler.update(dt);
 	for (i = 0; i < dungeon.anims.length; ++i) {
 		var obj = dungeon.anims[i];
+		if (obj.dead) continue;
 		if (obj.mesh.updateAnimation)
 			obj.mesh.updateAnimation(dt * 1000);
 	}
