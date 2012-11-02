@@ -24,7 +24,7 @@ function init() {
 	// Add pl later to the scene
 
 	// Player stats
-	pl.health = 100;
+	pl.hp = 100;
 	pl.bulletsPerClip = 15;
 	pl.bullets = pl.bulletsPerClip;
 	pl.clips = 5;
@@ -172,13 +172,9 @@ function animate(dt) {
 		if (monster.position.distanceToSquared(pl.position) > 4) {
 			if (monster.animation) monster.animation.play();
 			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
-		} else {
-			continue; // FIXME: Temporary
-			// Oh noes, death!
-			controls.active = false;
-			if (!$("#deathscreen").is(':visible'))
-				$("#deathscreen").fadeIn(500);
-			$("#instructions").hide();
+		} else if (!pl.dead) {
+			pl.hp--; // TODO: Touch damage from assets.js
+			updateHUD();
 			monster.setLinearVelocity(v.set(0,0,0));
 			if (monster.animation) monster.animation.stop();
 		}
@@ -250,6 +246,15 @@ $(document).ready(function() {
 	function render() {
 		requestAnimationFrame(render);
 		if (!dungeon.loaded) return;
+
+		if (!pl.dead && pl.hp <= 0) {
+			// Oh noes, death!
+			pl.dead = true;
+			controls.active = false;
+			if (!$("#deathscreen").is(':visible'))
+				$("#deathscreen").fadeIn(500);
+			$("#instructions").hide();
+		}
 
 		// Player movement, controls and physics
 		var dt = clock.getDelta();

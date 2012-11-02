@@ -89,7 +89,7 @@ function initUI() {
 }
 
 function updateHUD() {
-	$("#health").html(pl.health);
+	$("#health").html(pl.hp);
 	$("#bullets").html(pl.bullets);
 	$("#clips").html(pl.clips);
 }
