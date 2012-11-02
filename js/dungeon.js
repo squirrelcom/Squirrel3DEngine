@@ -108,6 +108,7 @@ function Dungeon(scene, player, levelName) {
 			// Character collision callbacks
 			if (def.sound) {
 				obj.addEventListener('collision', function(other, vel, rot) {
+					if (vel.lengthSq() < 1) return;
 					// TODO: Take velocity into account
 					if (other.damage) {
 						// TODO: Damage

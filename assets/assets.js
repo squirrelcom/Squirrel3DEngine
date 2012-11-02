@@ -17,5 +17,9 @@ var assets = {
 			sound: "metal"
 		}
 	},
+	sounds: {
+		"shoot": [ "fork-launch.wav" ],
+		"metal": [ "metal-1.wav", "metal-2.wav", "metal-3.wav" ]
+	},
 	environments: {}
 };
