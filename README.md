@@ -1,7 +1,8 @@
 Plasma Forks
 ============
 
-This is a small 3d first-person shooter for the web.
+This is a small 3d sci-fi first-person shooter for the web.
+
 
 System Requirements
 -------------------
@@ -16,8 +17,15 @@ System Requirements
 Acknowledgements
 ----------------
 
-This is based on several JS libraries, most prominently:
+This is based on several JS libraries/engines, most prominently:
 
+* Dark Corners - http://tapio.github.com/darkcorners/
+	* Game engine, the glue that ties everything together
+	* It's actually a medieval game prototype, but only the core engine was used for this
+		- Setting/theme changed
+		- All assets replaced
+		- Gameplay changed (e.g. shooting instead of running away)
+		- Sounds, weapons, collectables added, among other things
 * Three.js - http://mrdoob.github.com/three.js/
 	* Graphics engine
 * Physijs - http://chandlerprall.github.com/Physijs/
