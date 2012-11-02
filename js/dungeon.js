@@ -4,6 +4,7 @@ function Dungeon(scene, player, levelName) {
 	this.loaded = false;
 	this.objects = [];
 	this.monsters = [];
+	this.anims = [];
 	var dummy_material = new THREE.MeshBasicMaterial({color: 0x000000});
 	var debug_material = new THREE.MeshBasicMaterial({color: 0xff00ff});
 
@@ -102,8 +103,10 @@ function Dungeon(scene, player, levelName) {
 					obj.mesh.receiveShadow = true;
 				}
 				obj.add(obj.mesh);
-				self.monsters.push(obj);
+				self.anims.push(obj);
 			}
+
+			if (def.character) self.monsters.push(obj);
 
 			// Character collision callbacks
 			if (def.sound) {
