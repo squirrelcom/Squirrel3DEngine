@@ -106,15 +106,22 @@ function Dungeon(scene, player, levelName) {
 				self.anims.push(obj);
 			}
 
-			if (def.character) self.monsters.push(obj);
+			if (def.character) {
+				if (def.character.hp) obj.hp = def.character.hp;
+				self.monsters.push(obj);
+			}
 
 			// Character collision callbacks
 			if (def.sound) {
 				obj.addEventListener('collision', function(other, vel, rot) {
 					if (vel.lengthSq() < 1) return;
-					// TODO: Take velocity into account
-					if (other.damage) {
-						// TODO: Damage
+					if (this.hp && other.damage) {
+						this.hp -= other.damage;
+						var mats = this.mesh.geometry.materials;
+						for (var m = 0; m < mats.length; ++m) {
+							mats[m].color.r += 0.05;
+							mats[m].ambient.r += 0.05;
+						}
 					}
 					soundManager.play(def.sound);
 				});
