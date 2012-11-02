@@ -46,6 +46,16 @@ canvas {
 	transform: perspective(500px) rotateY(25deg);
 }
 
+#hud {
+	position: absolute;
+	top: 60%;
+	left: 5%;
+	color: #555;
+	text-align: left;
+	font-size: 32px;
+	font-family: 'Black Ops One', serif;
+}
+
 #deathscreen {
 	display: none;
 	position: fixed;
