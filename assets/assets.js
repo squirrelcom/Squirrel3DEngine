@@ -6,7 +6,8 @@ var assets = {
 		"barrel-red": { collision: "cylinder", mass: 250, sound: "metal" },
 		"barrel-rusty": { collision: "cylinder", mass: 250, sound: "metal" },
 		"gas-tank": { collision: "cylinder", mass: 350, sound: "metal" },
-		"trash": { collision: "box", mass: 150 }
+		"trash": { collision: "box", mass: 150 },
+		"turbine": { collision: "box", sound: "metal" }
 	},
 	items: {},
 	materials: {},
