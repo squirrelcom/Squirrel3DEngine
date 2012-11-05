@@ -179,12 +179,14 @@ function animate(dt) {
 		// Move?
 		if (monster.position.distanceToSquared(pl.position) > 4) {
 			if (monster.animation) monster.animation.play();
+			else monster.stopAnimation = false;
 			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
 		} else if (!pl.dead) {
 			pl.hp--; // TODO: Touch damage from assets.js
 			updateHUD();
 			monster.setLinearVelocity(v.set(0,0,0));
 			if (monster.animation) monster.animation.stop();
+			else monster.stopAnimation = true;
 		}
 	}
 
@@ -193,7 +195,7 @@ function animate(dt) {
 	for (i = 0; i < dungeon.anims.length; ++i) {
 		var obj = dungeon.anims[i];
 		if (obj.dead) continue;
-		if (obj.mesh.updateAnimation)
+		if (obj.mesh.updateAnimation && !obj.stopAnimation)
 			obj.mesh.updateAnimation(dt * 1000);
 	}
 
