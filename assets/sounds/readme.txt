@@ -13,3 +13,9 @@ robot-death.wav:
 	http://soundbible.com/1295-Dying-Light-Bulb.html
 	CC-BY-3.0
 
+empty-gun.wav, reload.wav:
+	Mike Koenig
+	http://soundbible.com/tags-gun.html
+	http://opengameart.org/content/shotgun-shoot-reload
+	CC-BY-3.0
+

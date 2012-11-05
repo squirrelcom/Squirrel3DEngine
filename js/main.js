@@ -117,6 +117,7 @@ function mouseHandler(button) {
 	projector.unprojectVector(_vector, pl.camera);
 	if (button == 0 && pl.rhand && pl.bullets <= 0) {
 		// Clip empty, force reload if there is more
+		soundManager.play("shoot-dry");
 		if (pl.clips <= 0) {
 			displayMessage("Out of ammo");
 			return;
@@ -124,6 +125,7 @@ function mouseHandler(button) {
 		pl.bullets = pl.bulletsPerClip;
 		--pl.clips;
 		updateHUD();
+		soundManager.play("reload");
 	} else if (button == 0 && pl.rhand && pl.bullets > 0) {
 		// Shoot!
 		soundManager.play("shoot");
