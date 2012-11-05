@@ -242,18 +242,19 @@ function Dungeon(scene, player, levelName) {
 			}
 		}
 
-		// Ceiling, no collision needed
-		var ceiling_plane = new THREE.Mesh(
+		// Ceiling
+		var ceiling_plane = new Physijs.PlaneMesh(
 			new PlaneGeometry(level.gridSize * level.width, level.gridSize * level.depth,
 				1, 1, "ny", level.width, level.depth),
-			cache.getMaterial(level.materials.ceiling)
+			Physijs.createMaterial(cache.getMaterial(level.materials.ceiling), 0.9, 0.0), // friction, restitution
+			0 // mass
 		);
 		ceiling_plane.position.set(level.gridSize * level.width * 0.5, level.roomHeight, level.gridSize * level.depth * 0.5);
 		ceiling_plane.matrixAutoUpdate = false;
 		ceiling_plane.updateMatrix();
 		scene.add(ceiling_plane);
 
-		// Floor with collision
+		// Floor
 		var floor_plane = new Physijs.PlaneMesh(
 			new PlaneGeometry(level.gridSize * level.width, level.gridSize * level.depth,
 				1, 1, "py", level.width, level.depth),
