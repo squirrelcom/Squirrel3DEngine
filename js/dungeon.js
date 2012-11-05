@@ -115,6 +115,11 @@ function Dungeon(scene, player, levelName) {
 				self.monsters.push(obj);
 			}
 
+			if (def.item) {
+				obj.items = {};
+				obj.items[def.item.type] = def.item.amount || 1;
+			}
+
 			// Character collision callbacks
 			obj.addEventListener('collision', function(other, vel, rot) {
 				if (vel.lengthSq() < 1) return;

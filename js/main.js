@@ -22,9 +22,16 @@ function init() {
 	);
 	pl.visible = false;
 	pl.addEventListener('collision', function(other, vel, rot) {
-		if (vel.lengthSq() < 1) return;
 		if (this.dead) return;
+		if (other.items) {
+			for (var i in other.items) {
+				if (pl[i] !== undefined)
+					pl[i] += other.items[i];
+			}
+			delete other.items;
+		}
 		if (other.damage) {
+			if (vel.lengthSq() < 1) return;
 			this.hp -= other.damage;
 			updateHUD();
 			// Death is checked in render loop
