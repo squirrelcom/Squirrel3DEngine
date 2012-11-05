@@ -117,7 +117,7 @@ function Dungeon(scene, player, levelName) {
 			if (def.sound) {
 				obj.addEventListener('collision', function(other, vel, rot) {
 					if (vel.lengthSq() < 1) return;
-					soundManager.play(def.sound);
+					if (other.damage) soundManager.play(def.sound);
 					if (this.dead) return;
 					if (this.hp && other.damage) {
 						this.hp -= other.damage;
