@@ -111,10 +111,27 @@ function resetLevel(levelName) {
 	dungeon = new Dungeon(scene, pl, levelName);
 }
 
+var shootVector = new THREE.Vector3();
+function shoot(shooter, rot, dir, off) {
+	var fork = dungeon.forks[dungeon.forkIndex];
+	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
+	fork.position.copy(shooter.position);
+	fork.rotation.copy(rot);
+	fork.updateMatrix();
+	fork.translateX(off.x);
+	fork.translateY(off.y);
+	fork.translateZ(off.z);
+	fork.__dirtyPosition = true;
+	fork.__dirtyRotation = true;
+	console.log(shootVector);
+	fork.setLinearVelocity(shootVector.multiplyScalar(25.0));
+	fork.visible = true;
+}
+
+var projector = new THREE.Projector();
 function mouseHandler(button) {
-	var _vector = new THREE.Vector3(0, 0, 1);
-	var projector = new THREE.Projector();
-	projector.unprojectVector(_vector, pl.camera);
+	shootVector.set(0, 0, 1);
+	projector.unprojectVector(shootVector, pl.camera);
 	if (button == 0 && pl.rhand && pl.bullets <= 0) {
 		// Clip empty, force reload if there is more
 		soundManager.play("shoot-dry");
@@ -130,28 +147,16 @@ function mouseHandler(button) {
 		// Shoot!
 		soundManager.play("shoot");
 		--pl.bullets;
-		var fork = dungeon.forks[dungeon.forkIndex];
-		dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
-		fork.position.copy(pl.position);
-		fork.rotation.copy(pl.camera.rotation);
-		fork.updateMatrix();
-		fork.translateX(0.2);
-		fork.translateY(0.4);
-		fork.translateZ(-0.95);
-		fork.__dirtyPosition = true;
-		fork.__dirtyRotation = true;
-		_vector.subSelf(pl.camera.position).normalize();
-		fork.setLinearVelocity(_vector.multiplyScalar(25.0));
-		fork.visible = true;
+		shoot(pl, pl.camera.rotation, shootVector.subSelf(pl.camera.position).normalize(), { x: 0.2, y: 0.4, z: -0.95 });
 		updateHUD();
 	} else if (button == 2) {
 		// Punch/push
-		var ray = new THREE.Ray(pl.camera.position, _vector.subSelf(pl.camera.position).normalize());
+		var ray = new THREE.Ray(pl.camera.position, shootVector.subSelf(pl.camera.position).normalize());
 		var intersections = ray.intersectObjects(dungeon.objects);
 		if (intersections.length > 0) {
 			var target = intersections[0].object;
 			if (target.position.distanceToSquared(pl.position) < 9)
-				target.applyCentralImpulse(_vector.multiplyScalar(10000));
+				target.applyCentralImpulse(shootVector.multiplyScalar(10000));
 		}
 	}
 }
