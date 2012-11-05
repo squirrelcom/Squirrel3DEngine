@@ -54,6 +54,10 @@ canvas {
 	text-align: left;
 	font-size: 32px;
 	font-family: 'Black Ops One', serif;
+	-webkit-transform: perspective(500px) rotateY(40deg);
+	-moz-transform: perspective(500px) rotateY(40deg);
+	-o-transform: perspective(500px) rotateY(40deg);
+	transform: perspective(500px) rotateY(40deg);
 }
 
 #deathscreen {
