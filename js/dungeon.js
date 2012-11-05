@@ -472,14 +472,14 @@ function Dungeon(scene, player, levelName) {
 		pl.setAngularFactor({ x: 0, y: 0, z: 0 });
 
 		// Player gun
-		cache.loadModel("../assets/items/gun/gun.js", function(geometry) {
+		cache.loadModel("assets/items/gun/gun.js", function(geometry) {
 			player.rhand = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
 			player.rhand.position.copy(player.position);
 			scene.add(player.rhand);
 		});
 
 		// Bullets
-		cache.loadModel("../assets/items/fork/fork.js", function(geometry) {
+		cache.loadModel("assets/items/fork/fork.js", function(geometry) {
 			self.forks = [];
 			self.forkIndex = 0;
 			for (var i = 0; i < 20; ++i) {
