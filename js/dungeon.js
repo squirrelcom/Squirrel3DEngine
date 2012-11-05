@@ -289,11 +289,11 @@ function Dungeon(scene, player, levelName) {
 				for (var m = 0; m < geometry.materials.length; ++m)
 					fixAnisotropy(geometry.materials[m]);
 				var mat = geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0];
-				var obj = new THREE.Mesh(geometry, mat);
+				var obj = new Physijs.CylinderMesh(geometry, mat, 0);
 				obj.position.copy(pos);
 				obj.rotation.y = rot;
-				obj.castShadow = true;
-				obj.receiveShadow = true;
+				//obj.castShadow = true;
+				//obj.receiveShadow = true;
 				obj.matrixAutoUpdate = false;
 				obj.updateMatrix();
 				scene.add(obj);
@@ -312,7 +312,7 @@ function Dungeon(scene, player, levelName) {
 			// Actual light
 			var light = new THREE.PointLight(0xffffaa, 1, 2 * level.gridSize);
 			light.position.copy(level.lights[i].position);
-			var torch = "assets/models/torch/torch.js";
+			var torch = "assets/models/wall-lamp/wall-lamp.js";
 
 			// Snap to wall
 			// Create wall candidates for checking which wall is closest to the light
@@ -344,10 +344,9 @@ function Dungeon(scene, player, levelName) {
 				target.set(light.position.x + vec.x , light.position.y - 1, light.position.z + vec.y);
 			} else {
 				// Switch to ceiling hanging light
-				torch = Math.random() < 0.5 ? "assets/models/torch-hanging-01/torch-hanging-01.js"
-					: "assets/models/torch-hanging-02/torch-hanging-02.js";
+				torch = "assets/models/ceiling-lamp/ceiling-lamp.js";
 				light.position.x = (level.lights[i].position.x|0) + 0.5;
-				light.position.y = level.roomHeight - 0.9;
+				light.position.y = level.roomHeight;
 				light.position.z = (level.lights[i].position.z|0) + 0.5;
 				target.copy(light.position);
 				target.y -= 1;
@@ -384,7 +383,7 @@ function Dungeon(scene, player, levelName) {
 			lightManager.addShadow(light2);
 
 			// Mesh
-			//cache.loadModel(torch, torchHandler(new THREE.Vector3().copy(light.position), snapped.a));
+			cache.loadModel(torch, torchHandler(new THREE.Vector3().copy(light.position), snapped.a));
 
 			// Flame
 			//if (CONFIG.particles)
