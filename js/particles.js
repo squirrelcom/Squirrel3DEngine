@@ -50,7 +50,7 @@ function createSimpleFire(position) {
 
 
 // Create a teleporter emitter
-var _novaTexture = loadTexture("assets/particles/nova.png", { alpha: true });
+var _novaTexture = null; //loadTexture("assets/particles/nova.png", { alpha: true });
 function createTeleporterParticles(position) {
 	var emitter = Fireworks.createEmitter({ nParticles: 30 });
 	emitter.effectsStackBuilder()
@@ -67,7 +67,7 @@ function createTeleporterParticles(position) {
 
 
 // Create a torch fire emitter
-var _fireTexture = loadTexture("assets/particles/flame.png", { alpha: true });
+var _fireTexture = null; //loadTexture("assets/particles/flame.png", { alpha: true });
 function createTexturedFire(parent) {
 	var numSprites = 8;
 	var emitter = Fireworks.createEmitter({ nParticles: 20 });
