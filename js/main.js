@@ -112,26 +112,28 @@ function resetLevel(levelName) {
 }
 
 var shootVector = new THREE.Vector3();
-function shoot(shooter, rot, dir, off) {
+function shoot(pos, rot, off, flip) {
+	soundManager.play("shoot");
 	var fork = dungeon.forks[dungeon.forkIndex];
 	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
-	fork.position.copy(shooter.position);
+	fork.position.copy(pos);
 	fork.rotation.copy(rot);
-	fork.updateMatrix();
+	if (flip) fork.rotation.y += Math.PI;
+	fork.updateMatrixWorld();
+	fork.matrixRotationWorld.extractRotation(fork.matrixWorld);
+	shootVector.set(0, 0, -1);
+	fork.matrixRotationWorld.multiplyVector3(shootVector);
 	fork.translateX(off.x);
 	fork.translateY(off.y);
 	fork.translateZ(off.z);
 	fork.__dirtyPosition = true;
 	fork.__dirtyRotation = true;
-	console.log(shootVector);
 	fork.setLinearVelocity(shootVector.multiplyScalar(25.0));
 	fork.visible = true;
 }
 
 var projector = new THREE.Projector();
 function mouseHandler(button) {
-	shootVector.set(0, 0, 1);
-	projector.unprojectVector(shootVector, pl.camera);
 	if (button == 0 && pl.rhand && pl.bullets <= 0) {
 		// Clip empty, force reload if there is more
 		soundManager.play("shoot-dry");
@@ -145,12 +147,13 @@ function mouseHandler(button) {
 		soundManager.play("reload");
 	} else if (button == 0 && pl.rhand && pl.bullets > 0) {
 		// Shoot!
-		soundManager.play("shoot");
 		--pl.bullets;
-		shoot(pl, pl.camera.rotation, shootVector.subSelf(pl.camera.position).normalize(), { x: 0.2, y: 0.4, z: -0.95 });
+		shoot(pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
 		updateHUD();
 	} else if (button == 2) {
 		// Punch/push
+		shootVector.set(0, 0, 1);
+		projector.unprojectVector(shootVector, pl.camera);
 		var ray = new THREE.Ray(pl.camera.position, shootVector.subSelf(pl.camera.position).normalize());
 		var intersections = ray.intersectObjects(dungeon.objects);
 		if (intersections.length > 0) {
@@ -166,6 +169,7 @@ function animate(dt) {
 	function getAnim(time) { return Math.abs(time - (time|0) - 0.5) * 2.0; }
 	function fract(num) { return num - (num|0); }
 	var i, v = new THREE.Vector3();
+	dt = dt < 0.1 ? dt : 0.1;
 
 	// AI
 	for (i = 0; i < dungeon.monsters.length; ++i) {
@@ -187,6 +191,10 @@ function animate(dt) {
 			monster.setLinearVelocity(v.set(0,0,0));
 			if (monster.animation) monster.animation.stop();
 			else monster.stopAnimation = true;
+		}
+		// Shoot?
+		if (Math.random() < 0.02) {
+			shoot(monster.position, monster.mesh.rotation, { x: 0, y: 0.11, z: -1.2 }, true);
 		}
 	}
 
