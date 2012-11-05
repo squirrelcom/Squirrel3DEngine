@@ -116,33 +116,31 @@ function Dungeon(scene, player, levelName) {
 			}
 
 			// Character collision callbacks
-			if (def.sound) {
-				obj.addEventListener('collision', function(other, vel, rot) {
-					if (vel.lengthSq() < 1) return;
-					if (other.damage) soundManager.play(def.sound);
-					if (this.dead) return;
-					if (this.hp && other.damage) {
-						this.hp -= other.damage;
-						// Check for death
-						if (this.hp <= 0) {
-							soundManager.play("robot-death");
-							this.dead = true;
-							if (this.animation) this.animation.stop();
-							this.setAngularFactor({ x: 1, y: 1, z: 1 });
-							this.mass = 2000;
-							this.mesh.material = dead_material;
-						} else {
-							// Hit effect
-							// TODO: Can't do this because the material is shared
-							//var mats = this.mesh.geometry.materials, m;
-							//for (m = 0; m < mats.length; ++m) {
-							//	mats[m].color.r += 0.05;
-							//	mats[m].ambient.r += 0.05;
-							//}
-						}
+			obj.addEventListener('collision', function(other, vel, rot) {
+				if (vel.lengthSq() < 1) return;
+				if (other.damage && def.sound) soundManager.play(def.sound);
+				if (this.dead) return;
+				if (this.hp && other.damage) {
+					this.hp -= other.damage;
+					// Check for death
+					if (this.hp <= 0) {
+						soundManager.play("robot-death");
+						this.dead = true;
+						if (this.animation) this.animation.stop();
+						this.setAngularFactor({ x: 1, y: 1, z: 1 });
+						this.mass = 2000;
+						this.mesh.material = dead_material;
+					} else {
+						// Hit effect
+						// TODO: Can't do this because the material is shared
+						//var mats = this.mesh.geometry.materials, m;
+						//for (m = 0; m < mats.length; ++m) {
+						//	mats[m].color.r += 0.05;
+						//	mats[m].ambient.r += 0.05;
+						//}
 					}
-				});
-			}
+				}
+			});
 
 			// Finalize
 			scene.add(obj);
@@ -485,8 +483,8 @@ function Dungeon(scene, player, levelName) {
 			self.forks = [];
 			self.forkIndex = 0;
 			for (var i = 0; i < 20; ++i) {
-				var fork = new Physijs.BoxMesh(geometry, geometry.materials[0], 10);
-				fork.damage = 1;
+				var fork = new Physijs.BoxMesh(geometry, geometry.materials[0], 100);
+				fork.damage = 5;
 				self.forks.push(fork);
 				fork.visible = false;
 				scene.add(fork);

@@ -21,6 +21,17 @@ function init() {
 		100
 	);
 	pl.visible = false;
+	pl.addEventListener('collision', function(other, vel, rot) {
+		if (vel.lengthSq() < 1) return;
+		if (this.dead) return;
+		if (other.damage) {
+			this.hp -= other.damage;
+			updateHUD();
+			// Death is checked in render loop
+			// TODO: Hit sound?
+			// TODO: Screen effect?
+		}
+	});
 	// Add pl later to the scene
 
 	// Player stats
