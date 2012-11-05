@@ -13,7 +13,7 @@ var assets = {
 	materials: {},
 	monsters: {
 		"robot": {
-			collision: "cylinder",
+			collision: "capsule",
 			character: { speed: 40, hp: 10 },
 			animation: { type: "morph", duration: "1000" },
 			sound: "metal"

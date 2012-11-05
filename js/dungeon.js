@@ -52,6 +52,8 @@ function Dungeon(scene, player, levelName) {
 					obj = new Physijs.CylinderMesh(geometry, material, mass);
 				else if (def.collision == "cone")
 					obj = new Physijs.ConeMesh(geometry, material, mass);
+				else if (def.collision == "capsule")
+					obj = new Physijs.CapsuleMesh(geometry, material, mass);
 				else if (def.collision == "convex")
 					obj = new Physijs.ConvexMesh(geometry, material, mass);
 				else if (def.collision == "concave")
