@@ -131,7 +131,7 @@ function onPointerLockChange() {
 		$("#instructions").hide();
 	} else {
 		controls.pointerLockEnabled = false;
-		$("#instructions").show();
+		if (!pl.dead) $("#instructions").show();
 	}
 }
 
