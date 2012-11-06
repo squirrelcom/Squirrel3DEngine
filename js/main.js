@@ -150,19 +150,24 @@ function shoot(pos, rot, off, flip) {
 	fork.visible = true;
 }
 
+function reload() {
+	if (pl.bullets >= pl.bulletsPerClip) return;
+	if (pl.clips <= 0) {
+		displayMessage("Out of ammo");
+		return;
+	}
+	pl.bullets = pl.bulletsPerClip;
+	--pl.clips;
+	updateHUD();
+	soundManager.play("reload");
+}
+
 var projector = new THREE.Projector();
 function mouseHandler(button) {
 	if (button == 0 && pl.rhand && pl.bullets <= 0) {
 		// Clip empty, force reload if there is more
 		soundManager.play("shoot-dry");
-		if (pl.clips <= 0) {
-			displayMessage("Out of ammo");
-			return;
-		}
-		pl.bullets = pl.bulletsPerClip;
-		--pl.clips;
-		updateHUD();
-		soundManager.play("reload");
+		reload();
 	} else if (button == 0 && pl.rhand && pl.bullets > 0) {
 		// Shoot!
 		--pl.bullets;
