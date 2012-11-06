@@ -2,7 +2,7 @@
 var pl, controls, scene, renderer, composer;
 var renderTargetParametersRGBA, renderTargetParametersRGB;
 var colorTarget, depthTarget, depthPassPlugin;
-var lightManager, soundManager, dungeon;
+var lightManager, soundManager, aiManager, dungeon;
 var clock = new THREE.Clock();
 var cache = new Cache();
 var passes = {};
@@ -129,6 +129,7 @@ function resetLevel(levelName) {
 	}
 	lightManager = new LightManager({ maxLights: CONFIG.maxLights, maxShadows: CONFIG.maxShadows });
 	soundManager = new SoundManager();
+	aiManager = new AIManager();
 	dungeon = new Dungeon(scene, pl, levelName);
 }
 
@@ -196,33 +197,6 @@ function animate(dt) {
 	function fract(num) { return num - (num|0); }
 	var i, v = new THREE.Vector3();
 	dt = dt < 0.1 ? dt : 0.1;
-
-	// AI
-	for (i = 0; i < dungeon.monsters.length; ++i) {
-		var monster = dungeon.monsters[i];
-		if (monster.dead) continue;
-		// Look at player
-		v.copy(pl.position);
-		v.subSelf(monster.position);
-		v.y = 0;
-		monster.mesh.lookAt(v.normalize());
-		// Move?
-		if (monster.position.distanceToSquared(pl.position) > 4) {
-			if (monster.animation) monster.animation.play();
-			else monster.stopAnimation = false;
-			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
-		} else if (!pl.dead) {
-			pl.hp--; // TODO: Touch damage from assets.js
-			updateHUD();
-			monster.setLinearVelocity(v.set(0,0,0));
-			if (monster.animation) monster.animation.stop();
-			else monster.stopAnimation = true;
-		}
-		// Shoot?
-		if (Math.random() < 0.02) {
-			shoot(monster.position, monster.mesh.rotation, { x: 0, y: 0.11, z: -1.2 }, true);
-		}
-	}
 
 	// Update object animations
 	THREE.AnimationHandler.update(dt);
@@ -323,6 +297,7 @@ $(document).ready(function() {
 		// FIXME: 0.5 below is magic number to rise camera
 		controls.object.position.set(pl.position.x, pl.position.y + 0.5, pl.position.z);
 
+		aiManager.process(dt);
 		animate(dt);
 		lightManager.update(pl);
 		renderer.clear();

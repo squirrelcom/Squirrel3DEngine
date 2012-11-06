@@ -513,7 +513,6 @@ function Dungeon(scene, player, levelName) {
 			dontCrossCorners: true,
 			heurestic: PF.Heuristic.euclidean
 		});
-		console.log(level.map.getWalkableMatrix());
 		self.loaded = true;
 	}
 
