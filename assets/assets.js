@@ -23,6 +23,7 @@ var assets = {
 		"shoot": [ "fork-launch.wav" ],
 		"shoot-dry": [ "empty-gun.wav" ],
 		"reload": [ "reload.wav" ],
+		"pick-up": [ "pick-up.wav" ],
 		"metal": [ "metal-1.wav", "metal-2.wav", "metal-3.wav" ],
 		"robot-death": [ "robot-death.wav" ]
 	},

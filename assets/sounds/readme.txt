@@ -19,3 +19,7 @@ empty-gun.wav, reload.wav:
 	http://opengameart.org/content/shotgun-shoot-reload
 	CC-BY-3.0
 
+pick-up.wav:
+	Blender Foundation
+	http://opengameart.org/content/pick-up-item-yo-frankie
+	CC-BY-3.0

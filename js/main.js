@@ -28,6 +28,7 @@ function init() {
 				if (pl[i] !== undefined)
 					pl[i] += other.items[i];
 			}
+			soundManager.play("pick-up");
 			other.items = undefined;
 			other.visible = false;
 			other.parent.remove(other);
