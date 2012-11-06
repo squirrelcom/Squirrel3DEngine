@@ -5,6 +5,9 @@ function Dungeon(scene, player, levelName) {
 	this.objects = [];
 	this.monsters = [];
 	this.anims = [];
+	this.grid = null;
+	this.pathFinder = null;
+	this.level = null;
 	var dummy_material = new THREE.MeshBasicMaterial({ color: 0x000000 });
 	var debug_material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
 	var dead_material = new THREE.MeshLambertMaterial({ color: 0x222222, ambient: 0x222222 });
@@ -504,6 +507,13 @@ function Dungeon(scene, player, levelName) {
 		self.addMonsters(level);
 		lightManager.update(pl);
 		self.level = level;
+		self.grid = new PF.Grid(level.width, level.depth, level.map.getWalkableMatrix());
+		self.pathFinder = new PF.AStarFinder({
+			allowDiagonal: true,
+			dontCrossCorners: true,
+			heurestic: PF.Heuristic.euclidean
+		});
+		console.log(level.map.getWalkableMatrix());
 		self.loaded = true;
 	}
 

@@ -62,4 +62,15 @@ function Map(w, h, data) {
 		floodFill(this, x, y, target, filler, skip);
 	};
 
+	this.getWalkableMatrix = function() {
+		var grid = new Array(h);
+		for (var j = 0; j < h; ++j) {
+			grid[j] = [];
+			for (var i = 0; i < w; ++i) {
+				grid[j].push(this.map[j * w + i] == WALL ? 1 : 0);;
+			}
+		}
+		return grid;
+	};
+
 }
