@@ -4,12 +4,12 @@ function AIManager() {
 
 	var v = new THREE.Vector3();
 
-	function walkTowards(monster, pos, dt) {
+	function walkTowards(monster, pos, sq_thres, dt) {
 		v.copy(pos);
 		v.subSelf(monster.position);
 		v.y = 0;
 		monster.mesh.lookAt(v.normalize());
-		if (monster.position.distanceToSquared(pos) > 2) {
+		if (monster.position.distanceToSquared(pos) >= sq_thres) {
 			if (monster.animation) monster.animation.play();
 			else monster.stopAnimation = false;
 			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
@@ -44,7 +44,7 @@ function AIManager() {
 				monster.activated = true;
 				monster.waypoints = null; // Clear waypoints
 				// Look at player
-				walkTowards(monster, pl.position, dt);
+				walkTowards(monster, pl.position, 12, dt);
 				// Shoot?
 				if (Math.random() < 0.05) {
 					shoot(monster.position, monster.mesh.rotation, v.set(0, 0.11, -1.2), true);
@@ -59,7 +59,7 @@ function AIManager() {
 				monster.waypoints = [];
 				//path = PF.Util.smoothenPath(dungeon.grid, path);
 				for (j = 0; j < path.length; ++j) {
-					v.set((path[j][0] + 0.5) * gridSize, monster.position.y, (path[j][1] + 0.5) *gridSize);
+					v.set((path[j][0] + 0.5) * gridSize, monster.position.y, (path[j][1] + 0.5) * gridSize);
 					monster.waypoints.push(v.clone());
 				}
 			}
@@ -68,7 +68,7 @@ function AIManager() {
 			if (monster.waypoints) {
 				if (!monster.waypoints.length)
 					monster.waypoints = null;
-				else if (walkTowards(monster, monster.waypoints[0], dt)) {
+				else if (walkTowards(monster, monster.waypoints[0], 1, dt)) {
 					// Move on to the next waypoint
 					monster.waypoints.splice(0, 1);
 				}
