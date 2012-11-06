@@ -7,6 +7,13 @@ function SoundManager() {
 	this.play = function(name) {
 		sounds[name].play();
 	};
+
+	this.playSpatial = function(name, position, radius) {
+		// Hack: Should have an update method instead of using a global reference
+		var distance = pl.camera.position.distanceTo(position);
+		if (distance < radius)
+			sounds[name].play(1 - distance / radius);
+	};
 }
 
 function Sound(samples, minPlayers) {
@@ -20,10 +27,13 @@ function Sound(samples, minPlayers) {
 		for (var i = 0; i < samples.length; ++i)
 			this.samples.push(new Audio("assets/sounds/" + samples[i]));
 
-	this.play = function() {
-		if (window.chrome) this.samples[this.sampleIndex].load(); // Chrome requires reload
-		else this.samples[this.sampleIndex].currentTime = 0;
-		this.samples[this.sampleIndex].play();
+	this.play = function(volume) {
+		var sample = this.samples[this.sampleIndex];
+		if (window.chrome) sample.load(); // Chrome requires reload
+		else sample.currentTime = 0;
+		if (volume !== undefined)
+			sample.volume = volume;
+		sample.play();
 		this.sampleIndex = (this.sampleIndex + 1) % this.samples.length;
 	};
 }

@@ -123,13 +123,14 @@ function Dungeon(scene, player, levelName) {
 			// Character collision callbacks
 			obj.addEventListener('collision', function(other, vel, rot) {
 				if (vel.lengthSq() < 1) return;
-				if (other.damage && def.sound) soundManager.play(def.sound);
+				if (other.damage && def.sound)
+					soundManager.playSpatial(def.sound, other.position, 10);
 				if (this.dead) return;
 				if (this.hp && other.damage) {
 					this.hp -= other.damage;
 					// Check for death
 					if (this.hp <= 0) {
-						soundManager.play("robot-death");
+						soundManager.playSpatial("robot-death", 20);
 						this.dead = true;
 						if (this.animation) this.animation.stop();
 						this.setAngularFactor({ x: 1, y: 1, z: 1 });

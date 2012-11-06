@@ -131,7 +131,7 @@ function resetLevel(levelName) {
 
 var shootVector = new THREE.Vector3();
 function shoot(pos, rot, off, flip) {
-	soundManager.play("shoot");
+	soundManager.playSpatial("shoot", pos, 20);
 	var fork = dungeon.forks[dungeon.forkIndex];
 	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
 	fork.position.copy(pos);
