@@ -28,7 +28,9 @@ function init() {
 				if (pl[i] !== undefined)
 					pl[i] += other.items[i];
 			}
-			delete other.items;
+			other.items = undefined;
+			other.visible = false;
+			other.parent.remove(other);
 		}
 		if (other.damage) {
 			if (vel.lengthSq() < 1) return;
