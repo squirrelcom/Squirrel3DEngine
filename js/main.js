@@ -2,7 +2,7 @@
 var pl, controls, scene, renderer, composer;
 var renderTargetParametersRGBA, renderTargetParametersRGB;
 var colorTarget, depthTarget, depthPassPlugin;
-var lightManager, soundManager, aiManager, dungeon;
+var lightManager, animationManager, soundManager, aiManager, dungeon;
 var clock = new THREE.Clock();
 var cache = new Cache();
 var passes = {};
@@ -129,6 +129,7 @@ function resetLevel(levelName) {
 		window.location.reload(true);
 	}
 	lightManager = new LightManager({ maxLights: CONFIG.maxLights, maxShadows: CONFIG.maxShadows });
+	animationManager = new AnimationManager();
 	soundManager = new SoundManager();
 	aiManager = new AIManager();
 	dungeon = new Dungeon(scene, pl, levelName);
@@ -200,13 +201,7 @@ function animate(dt) {
 	dt = dt < 0.1 ? dt : 0.1;
 
 	// Update object animations
-	THREE.AnimationHandler.update(dt);
-	for (i = 0; i < dungeon.anims.length; ++i) {
-		var obj = dungeon.anims[i];
-		if (obj.dead) continue;
-		if (obj.mesh.updateAnimation && !obj.stopAnimation)
-			obj.mesh.updateAnimation(dt * 1000);
-	}
+	animationManager.update(dt);
 
 	// Lights
 	var timeNow = new Date().getTime();

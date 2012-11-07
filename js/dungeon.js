@@ -4,7 +4,6 @@ function Dungeon(scene, player, levelName) {
 	this.loaded = false;
 	this.objects = [];
 	this.monsters = [];
-	this.anims = [];
 	this.grid = null;
 	this.pathFinder = null;
 	this.level = null;
@@ -24,22 +23,12 @@ function Dungeon(scene, player, levelName) {
 				scale += randf(-def.randScale, def.randScale);
 				mass *= scale;
 			}
-			if (def.animation && def.animation.type === "morph") geometry.computeMorphNormals();
 			if (!geometry.boundingBox) geometry.computeBoundingBox();
 
-			// Handle materials
-			for (var m = 0; m < geometry.materials.length; ++m) {
+			// Fix anisotropy
+			for (var m = 0; m < geometry.materials.length; ++m)
 				fixAnisotropy(geometry.materials[m]);
-				// Handle animation stuff
-				if (def.animation) {
-					if (def.animation.type === "morph") {
-						geometry.materials[m].morphTargets = true;
-						geometry.materials[m].morphNormals = true;
-					} else if (def.animation.type === "bones") {
-						geometry.materials[m].skinning = true;
-					}
-				}
-			}
+
 			var mat = geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0];
 
 			// Mesh creation
@@ -95,22 +84,12 @@ function Dungeon(scene, player, levelName) {
 			// Handle animated meshes
 			if (def.animation) {
 				obj.visible = false;
-				if (def.animation.type === "morph") {
-					obj.mesh = new THREE.MorphAnimMesh(geometry, mat);
-					obj.mesh.duration = def.animation.duration;
-					obj.mesh.time = obj.mesh.duration * Math.random();
-				} else if (def.animation.type === "bones") {
-					obj.mesh = new THREE.SkinnedMesh(geometry, mat); // TODO: useVertexTexture?
-					THREE.AnimationHandler.add(geometry.animation);
-					obj.animation = new THREE.Animation(obj.mesh, "walk");
-					//obj.animation.play();
-				}
+				obj.mesh = animationManager.createAnimatedMesh(geometry, mat, def);
 				if (!def.noShadows) {
 					obj.mesh.castShadow = true;
 					obj.mesh.receiveShadow = true;
 				}
 				obj.add(obj.mesh);
-				self.anims.push(obj);
 			}
 
 			if (def.character) {
@@ -135,7 +114,7 @@ function Dungeon(scene, player, levelName) {
 					if (this.hp <= 0) {
 						soundManager.playSpatial("robot-death", 20);
 						this.dead = true;
-						if (this.animation) this.animation.stop();
+						this.mesh.animate = false;
 						this.setAngularFactor({ x: 1, y: 1, z: 1 });
 						this.mass = 2000;
 						this.mesh.material = dead_material;

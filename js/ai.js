@@ -10,14 +10,12 @@ function AIManager() {
 		v.y = 0;
 		monster.mesh.lookAt(v.normalize());
 		if (monster.position.distanceToSquared(pos) >= sq_thres) {
-			if (monster.animation) monster.animation.play();
-			else monster.stopAnimation = false;
 			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
+			monster.mesh.animate = true;
 			return false;
 		} else {
 			monster.setLinearVelocity(v.set(0, 0, 0));
-			if (monster.animation) monster.animation.stop();
-			else monster.stopAnimation = true;
+			monster.mesh.animate = false;
 			return true;
 		}
 	}
