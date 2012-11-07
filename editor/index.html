@@ -96,7 +96,8 @@
 			tools["Import level"](localStorage.getItem("editor-autosave"));
 
 		// Material gallery
-		var materials = [ "metal-01", "metal-02", "metal-03", "metal-bumps-01", "metal-bumps-02", "metal-bumps-03", "metal-colored-01", "metal-colored-02", "metal-colored-03", "metal-colored-04", "metal-colored-05", "metal-colored-06", "metal-colored-07", "metal-colored-08", "metal-colored-09", "metal-corrugated-01", "metal-corrugated-02", "metal-worn-01", "metal-worn-02" ];
+		var materials = [];
+		for (i in assets.materials) materials.push(i);
 		var mtemplate = '<td><img id="tex-%1" src="../assets/textures/thumbs/%1.jpg" width="64" height="64" alt="%1" title="%1"></img></td>';
 		var mcols = 10;
 		var mgallery = "";

@@ -10,7 +10,6 @@ var assets = {
 		"turbine": { collision: "box", sound: "metal" }
 	},
 	items: {},
-	materials: {},
 	monsters: {
 		"robot": {
 			collision: "capsule",
@@ -26,6 +25,27 @@ var assets = {
 		"pick-up": [ "pick-up.wav" ],
 		"metal": [ "metal-1.wav", "metal-2.wav", "metal-3.wav" ],
 		"robot-death": [ "robot-death.wav" ]
+	},
+	materials: {
+		"metal-01": {},
+		"metal-02": {},
+		"metal-03": {},
+		"metal-bumps-01": {},
+		"metal-bumps-02": {},
+		"metal-bumps-03": {},
+		"metal-colored-01": {},
+		"metal-colored-02": {},
+		"metal-colored-03": {},
+		"metal-colored-04": {},
+		"metal-colored-05": {},
+		"metal-colored-06": {},
+		"metal-colored-07": {},
+		"metal-colored-08": {},
+		"metal-colored-09": {},
+		"metal-corrugated-01": {},
+		"metal-corrugated-02": {},
+		"metal-worn-01": {},
+		"metal-worn-02": {},
 	},
 	environments: {}
 };
