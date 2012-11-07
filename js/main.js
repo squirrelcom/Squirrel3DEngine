@@ -29,6 +29,7 @@ function init() {
 					pl[i] += other.items[i];
 			}
 			soundManager.play("pick-up");
+			updateHUD();
 			other.items = undefined;
 			other.visible = false;
 			other.parent.remove(other);
