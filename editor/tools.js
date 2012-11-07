@@ -120,7 +120,7 @@ tools.item = {
 		currentTool = tools.item;
 		canvas.style.cursor = "crosshair";
 	},
-	item: "key",
+	item: "", // Populated from assets.js
 	items: [], // Populated from assets.js
 	mousedown: function(e) {
 		if (e.button == 0) {
@@ -146,7 +146,7 @@ tools.monster = {
 		currentTool = tools.monster;
 		canvas.style.cursor = "crosshair";
 	},
-	monster: "robot",
+	monster: "", // Populated from assets.js
 	monsters: [], // Populated from assets.js
 	mousedown: function(e) {
 		if (e.button == 0) {
