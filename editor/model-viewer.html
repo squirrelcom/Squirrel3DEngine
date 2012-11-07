@@ -95,6 +95,7 @@
 					renderer.setClearColor(c, 1.0);
 				});
 				gui.add(window, "squareCanvas");
+				gui.add(window, "thumbnailCanvas");
 				gui.add(window, "screenshot");
 
 				document.addEventListener('mousedown', function(e) {
@@ -120,6 +121,12 @@
 
 			function squareCanvas() {
 				renderer.setSize(512, 512);
+				camera.aspect = 1;
+				camera.updateProjectionMatrix();
+			}
+
+			function thumbnailCanvas() {
+				renderer.setSize(64, 64);
 				camera.aspect = 1;
 				camera.updateProjectionMatrix();
 			}
