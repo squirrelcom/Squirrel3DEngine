@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>Model Viewer for Dark Corners</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#555;
+				color:#fff;
+				padding:0;
+				margin:0;
+				font-weight: bold;
+				overflow:hidden;
+			}
+		</style>
+		<script src="../libs/dat.gui.min.js"></script>
+		<script src="../assets/assets.js"></script>
+		<script src="../libs/three.min.js"></script>
+		<script src="../js/utils.js"></script>
+	</head>
+
+	<body>
+		<script>
+			var container, loader;
+			var camera, scene, renderer;
+			var mesh, model, bgcolor = [128, 128, 128];
+			var pointLight, ambientLight;
+			var mouseX = 0;
+			var mouseY = 0;
+			var mouseDragRefX = 0;
+			var mouseDragRefY = 0;
+			var mouseDown = false;
+
+			init();
+			render();
+
+			function init() {
+
+				container = document.createElement('div');
+				document.body.appendChild(container);
+
+				camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 0.1, 50);
+				camera.position.y = 4;
+				camera.position.z = 4;
+				camera.lookAt({ x: 0, y: 0, z: 0 });
+
+				scene = new THREE.Scene();
+
+				ambientLight = new THREE.AmbientLight(0x444444);
+				scene.add(ambientLight);
+
+				pointLight = new THREE.PointLight(0xffffff, 2.5, 10);
+				pointLight.color.setHSV(0.05, 0.05, 1);
+				pointLight.position.set(3, 6, 2);
+				scene.add(pointLight);
+
+				var objects = [];
+				for (i in assets.objects) objects.push(i);
+				model = window.location.hash ? window.location.hash.replace('#', '') : objects[objects.length-1];
+
+				loader = new THREE.JSONLoader(true);
+				document.body.appendChild(loader.statusDomElement);
+				loader.load("../assets/models/" + model + "/" + model + ".js", createScene);
+
+				var c = (new THREE.Color()).setRGB(bgcolor[0]/255, bgcolor[1]/255, bgcolor[2]/255);
+				renderer = new THREE.WebGLRenderer({
+					antialias: true, clearColor: c.getHex(), preserveDrawingBuffer: true, clearAlpha: 1
+				});
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				container.appendChild(renderer.domElement);
+
+				renderer.gammaInput = true;
+				renderer.gammaOutput = true;
+				renderer.physicallyBasedShading = true;
+
+				var gui = new dat.GUI();
+				gui.add(window, "model", objects).onChange(function() {
+					loader.statusDomElement.style.display = "block";
+					scene.remove(mesh);
+					var magic = "?cacheOverwrite=" + Math.random();
+					loader.load("../assets/models/" + model + "/" + model + ".js" + magic, createScene);
+				});
+				gui.addColor(window, "bgcolor").onChange(function() {
+					if (typeof bgcolor == "string") {
+						bgcolor = bgcolor.charAt(0) == "#" ? bgcolor.substring(1,7) : bgcolor;
+						bgcolor = [
+							parseInt(bgcolor.substring(0, 2), 16),
+							parseInt(bgcolor.substring(2, 4), 16),
+							parseInt(bgcolor.substring(4, 6), 16),
+						];
+					}
+					var c = (new THREE.Color()).setRGB(bgcolor[0]/255, bgcolor[1]/255, bgcolor[2]/255);
+					console.log(bgcolor);
+					renderer.setClearColor(c, 1.0);
+				});
+				gui.add(window, "squareCanvas");
+				gui.add(window, "screenshot");
+
+				document.addEventListener('mousedown', function(e) {
+					mouseDragRefX = e.clientX;
+					mouseDragRefY = e.clientY;
+					mouseDown = e.button;
+				}, false);
+				document.addEventListener('mouseup', function(e) { mouseDown = false; }, false);
+				document.addEventListener('mousemove', onMouseMove, false);
+				document.addEventListener('contextmenu', function (e) { e.preventDefault(); }, false);
+				window.addEventListener('resize', onWindowResize, false);
+			}
+
+			function createScene(geometry) {
+				for (var m = 0; m < geometry.materials.length; ++m)
+					fixAnisotropy(geometry.materials[m], renderer.getMaxAnisotropy());
+				mesh = new THREE.Mesh(geometry, geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0]);
+				mesh.castShadow = true;
+				mesh.receiveShadow = true;
+				scene.add(mesh);
+				loader.statusDomElement.style.display = "none";
+			}
+
+			function squareCanvas() {
+				renderer.setSize(512, 512);
+				camera.aspect = 1;
+				camera.updateProjectionMatrix();
+			}
+
+			function onWindowResize(e) {
+				renderer.setSize(window.innerWidth, window.innerHeight);
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+			}
+
+			function onMouseMove(e) {
+				if (mouseDown === false) return;
+				mouseX = (e.clientX - mouseDragRefX);
+				mouseY = (e.clientY - mouseDragRefY);
+				mouseDragRefX = e.clientX;
+				mouseDragRefY = e.clientY;
+			}
+
+			function render() {
+				requestAnimationFrame(render);
+
+				if (mesh && mouseDown === 0) {
+					mesh.rotation.y += mouseX * 0.01;
+					mesh.rotation.x += mouseY * 0.01;
+				} else if (mesh && mouseDown === 2) {
+					mesh.scale.x += mouseY * 0.01;
+					mesh.scale.x = Math.max(mesh.scale.x, 0.1);
+					mesh.scale.y = mesh.scale.x;
+					mesh.scale.z = mesh.scale.x;
+				}
+
+				mouseX = 0;
+				mouseY = 0;
+
+				renderer.render(scene, camera);
+			}
+
+		</script>
+
+	</body>
+</html>

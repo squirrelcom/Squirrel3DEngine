@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Level Editor for Dark Corners</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body { color: #ccc; position: relative; background-color: #333; }
+		canvas { background-color: #ccc; position: relative; }
+		#thumbs { float: left; margin-right: 10px; }
+		#exported { display: none; width: 640px; height: 480px; }
+		#tooltip {
+			display: none;
+			position: absolute;
+			background-color: rgba(0, 0, 0, 0.5);
+			border-radius: 5px;
+			padding: 5px;
+		}
+	</style>
+	<script src="../libs/dat.gui.min.js"></script>
+	<script src="../assets/assets.js"></script>
+	<script src="../js/map.js"></script>
+	<script src="tools.js"></script>
+</head>
+<body>
+	<h3>Level editor</h3>
+	<canvas id="canvas" width="640", height="640">
+		<p>Oh noes, no &lt;canvas&gt;!</p>
+	</canvas>
+	<div id="tooltip"></div>
+	<p>Left click to draw walls or place selected thing. Right click to erase.</p>
+	<textarea id="exported"></textarea>
+	<p>Object reference: hover over the image to see the name.
+	Currently you <strong>cannot</strong> click them.</p>
+	<table id="objthumbs"></table>
+	<p>Material reference: hover over the image to see the name to put to the map properties.
+	Currently you <strong>cannot</strong> click them and the material cannot be set for individual tiles.</p>
+	<table id="matthumbs"></table>
+
+	<script>
+		window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
+		var hashParams = (function() {
+			var params = {}, param;
+			var q = window.location.hash.replace('#', '').split('&');
+			for (var i = 0; i < q.length; ++i) {
+				param = q[i].split('=');
+				params[param[0]] = param[1];
+			}
+			return params;
+		})();
+
+		var tooltip = document.getElementById("tooltip");
+		var canvas = document.getElementById("canvas");
+		var w = 40, h = 40;
+		var s = canvas.width / w;
+		var ctx = canvas.getContext("2d");
+		ctx.font = "bolder " + ((s*0.9)|0) + "px monospace";
+		ctx.textBaseline = "middle";
+		ctx.textAlign = "center";
+
+		var i;
+
+		var editor = {
+			drawGrid: true,
+			drawTextures: false,
+			hideLights: false,
+			hideObjects: false,
+			hideItems: false,
+			hideMonsters: false,
+			hideTriggers: false
+		};
+
+		var level = {
+			materials: {
+				ceiling: "rock-01",
+				wall: "stone-01",
+				floor: "stone-floor-01"
+			},
+			roomHeight: 3,
+			gridSize: 2,
+			lights: [],
+			objects: [],
+			items: [],
+			monsters: [],
+			triggers: [],
+			start: [ Math.floor(w*0.3)-0.5, Math.floor(h/2)-0.5 ],
+			startAngle: 0,
+			exit: [ Math.floor(w*0.7)-0.5, Math.floor(h/2)-0.5 ],
+			width: w,
+			depth: h,
+			map: new Map(w, h, OPEN)
+		};
+		if (hashParams.level)
+			tools["Import level"](hashParams.level);
+		else if (localStorage.getItem("editor-autosave"))
+			tools["Import level"](localStorage.getItem("editor-autosave"));
+
+		// Material gallery
+		var materials = [ "metal-01", "metal-02", "metal-03", "metal-bumps-01", "metal-bumps-02", "metal-bumps-03", "metal-colored-01", "metal-colored-02", "metal-colored-03", "metal-colored-04", "metal-colored-05", "metal-colored-06", "metal-colored-07", "metal-colored-08", "metal-colored-09", "metal-corrugated-01", "metal-corrugated-02", "metal-worn-01", "metal-worn-02" ];
+		var mtemplate = '<td><img id="tex-%1" src="../assets/textures/thumbs/%1.jpg" width="64" height="64" alt="%1" title="%1"></img></td>';
+		var mcols = 10;
+		var mgallery = "";
+		for (i = 0; i < materials.length; ++i) {
+			if (i % mcols === 0) mgallery += '<tr>';
+			mgallery += mtemplate.replace(/%1/g, materials[i]);
+			if (i % mcols == mcols-1) mgallery += '</tr>';
+		}
+		document.getElementById("matthumbs").innerHTML = mgallery;
+		var images = {};
+		for (i = 0; i < materials.length; ++i)
+			images[materials[i]] = document.getElementById("tex-" + materials[i]);
+
+		// Object gallery
+		for (i in assets.objects) tools.object.objects.push(i);
+		var otemplate = '<td><img id="obj-%1" src="../assets/models/%1/thumb.jpg" width="64" height="64" alt="%1" title="%1"></img></td>';
+		var ocols = 10;
+		var ogallery = "";
+		for (i = 0; i < tools.object.objects.length; ++i) {
+			if (i % ocols === 0) ogallery += '<tr>';
+			ogallery += otemplate.replace(/%1/g, tools.object.objects[i]);
+			if (i % ocols == ocols-1) ogallery += '</tr>';
+		}
+		document.getElementById("objthumbs").innerHTML = ogallery;
+
+		// Items
+		for (i in assets.items) tools.item.items.push(i);
+
+		// Monsters
+		for (i in assets.monsters) tools.monster.monsters.push(i);
+
+		function putMouse(x, y, what) {
+			x = Math.floor(x / s);
+			y = Math.floor(y / s);
+			level.map.put(x, y, what);
+		}
+
+		function getMouse(x, y, fallback) {
+			x = Math.floor(x / s);
+			y = Math.floor(y / s);
+			return level.map.get(x, y, fallback);
+		}
+
+		function showTooltip(x, y, msg) {
+			tooltip.innerHTML = msg;
+			tooltip.style.display = "block";
+			tooltip.style.left = (x + 15) + "px";
+			tooltip.style.top = y + "px";
+		}
+
+		function hideTooltip() {
+			tooltip.style.display = "none";
+		}
+
+		function renderThingArray(arr, style, radius) {
+			ctx.fillStyle = style;
+			for (var i = 0; i < arr.length; ++i) {
+				ctx.beginPath();
+				ctx.arc(arr[i].position.x * s, arr[i].position.z * s, radius, 0, Math.PI * 2);
+				ctx.fill();
+			}
+		}
+
+		function render() {
+			requestAnimationFrame(render);
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			var i, j, cell;
+			// Grid and walls
+			ctx.strokeStyle = "#999";
+			ctx.fillStyle = "#640";
+			for (j = 0; j < h; ++j) {
+				for (i = 0; i < w; ++i) {
+					cell = level.map.get(i, j);
+					if (cell == DIAG) ctx.globalAlpha = 0.5;
+					else ctx.globalAlpha = 1.0;
+					if (editor.drawTextures) {
+						if (cell == WALL || cell == DIAG)
+							ctx.drawImage(images[level.materials.wall], i * s, j * s, s, s);
+						else ctx.drawImage(images[level.materials.floor], i * s, j * s, s, s);
+					} else {
+						if (cell == WALL || cell == DIAG)
+							ctx.fillRect(i * s, j * s, s, s);
+					}
+					if (editor.drawGrid)
+						ctx.strokeRect(i * s, j * s, s, s);
+				}
+			}
+			// Lights
+			if (!editor.hideLights)
+				renderThingArray(level.lights, "rgba(255,255,0,0.75)", s * 0.25);
+			// Objects
+			if (!editor.hideObjects)
+				renderThingArray(level.objects, "rgba(0,0,128,0.75)", s * 0.4);
+			// Items
+			if (!editor.hideItems)
+				renderThingArray(level.items, "rgba(160,0,160,0.75)", s * 0.2);
+			// Monsters
+			if (!editor.hideMonsters)
+				renderThingArray(level.monsters, "rgba(160,0,0,0.75)", s * 0.4);
+			// Triggers
+			if (!editor.hideTriggers)
+				renderThingArray(level.triggers, "rgba(64,255,64,0.75)", s * 0.6);
+			// Start
+			ctx.fillStyle = "#229";
+			ctx.fillRect(level.start[0] * s + 1 - s/2, level.start[1] * s + 1 - s/2, s - 2, s - 2);
+			ctx.fillStyle = "#66f";
+			ctx.fillText("S", level.start[0] * s, level.start[1] * s);
+			// Exit
+			ctx.fillStyle = "#922";
+			ctx.fillRect(level.exit[0] * s + 1 - s/2, level.exit[1] * s + 1 - s/2, s - 2, s - 2);
+			ctx.fillStyle = "#f66";
+			ctx.fillText("E", level.exit[0] * s, level.exit[1] * s);
+		}
+
+		function prepareExport() {
+			var errors = [];
+			// Fill floor
+			level.map.replace(OPEN, VOID);
+			level.map.fill(Math.floor(level.start[0]), Math.floor(level.start[1]), VOID, OPEN, DIAG);
+			// Check for unreachable exit
+			if (level.map.get(Math.floor(level.exit[0]), Math.floor(level.exit[1])) != OPEN)
+				errors.push("Error: Exit is unreachable!");
+			// Check for reaching the borders
+			var closed = true;
+			for (var i = 0; i < w; ++i) {
+				if (level.map.get(i, 0) == OPEN) { closed = false; break; }
+				if (level.map.get(i, h-1) == OPEN) { closed = false; break; }
+			}
+			if (closed) {
+				for (var j = 0; j < h; ++j) {
+					if (level.map.get(0, j) == OPEN) { closed = false; break; }
+					if (level.map.get(w-1, 0) == OPEN) { closed = false; break; }
+				}
+			}
+			if (!closed) errors.push("Error: Walls are not closed!");
+			// Lights are useful to have
+			if (!level.lights.length) errors.push("Warning: There are no lights in the level.");
+			// Display check results to user
+			if (errors.length) alert(errors.join('\n'));
+		}
+
+		var gui = new dat.GUI();
+		gui.add(tools, "Clear");
+		gui.add(tools.walls, "Draw walls");
+		gui.add(tools.diagonals, "Place diagonal walls");
+
+		var guiMap = gui.addFolder("Map properties");
+		guiMap.add(level.materials, "ceiling", materials);
+		guiMap.add(level.materials, "wall", materials);
+		guiMap.add(level.materials, "floor", materials);
+		guiMap.add(level, "roomHeight", 2, 10).step(0.5);
+		guiMap.add(level, "gridSize", 1, 4).step(1);
+		guiMap.add(level, "startAngle", -135, 180).step(45);
+		guiMap.add(tools.start, "Place start");
+		guiMap.add(tools.exit, "Place exit");
+
+		var guiLights = gui.addFolder("Lights");
+		guiLights.add(tools.light, "Add light");
+
+		var guiObjects = gui.addFolder("Objects");
+		guiObjects.add(tools.object, "object", tools.object.objects).onChange(
+			function() { currentTool = tools.object; });
+		guiObjects.add(tools.object, "angle", -165, 180).step(15);
+		guiObjects.add(tools, "Preview object");
+		guiObjects.add(tools.object, "Add object");
+
+		var guiItems = gui.addFolder("Items");
+		guiItems.add(tools.item, "item", tools.item.items).onChange(
+			function() { currentTool = tools.item; });
+		guiItems.add(tools.item, "Add item");
+
+		var guiMonsters = gui.addFolder("Monsters");
+		guiMonsters.add(tools.monster, "monster", tools.monster.monsters).onChange(
+			function() { currentTool = tools.monster; });
+		guiMonsters.add(tools.monster, "Add monster");
+
+		var guiTriggers = gui.addFolder("Triggers");
+		guiTriggers.add(tools.trigger, "type", tools.trigger.types);
+		guiTriggers.add(tools.trigger, "Add trigger");
+
+		var guiEditor = gui.addFolder("Editor options");
+		guiEditor.add(editor, "drawGrid");
+		guiEditor.add(editor, "drawTextures");
+		guiEditor.add(editor, "hideLights");
+		guiEditor.add(editor, "hideObjects");
+		guiEditor.add(editor, "hideItems");
+		guiEditor.add(editor, "hideMonsters");
+		guiEditor.add(editor, "hideTriggers");
+		gui.add(tools, "Import level");
+		gui.add(tools, "Export base64");
+		gui.add(tools, "Export JSON");
+		gui.add(tools, "Test");
+
+		function mouseHandler(e) {
+			e._x = e.layerX || e.offsetX || 0;
+			e._y = e.layerY || e.offsetY || 0;
+			// Tooltips
+			if (e.type === "mousemove" && !editor.hideObjects) {
+				var found = false, i;
+				var arr = level.objects.concat(level.items, level.monsters, level.triggers);
+				for (i = 0; i < arr.length; ++i) {
+					var pos = arr[i].position;
+					if (Math.abs(e._x - pos.x * s) < s * 0.5 && Math.abs(e._y - pos.z * s) < s * 0.5) {
+						showTooltip(e._x, e._y, arr[i].name || arr[i].message);
+						found = true;
+						break;
+					}
+				}
+				if (!found) hideTooltip();
+			}
+			if (currentTool[e.type]) currentTool[e.type](e);
+			return false;
+		}
+
+		canvas.addEventListener("mousedown", mouseHandler, false);
+		canvas.addEventListener("mouseup", mouseHandler, false);
+		canvas.addEventListener("mousemove", mouseHandler, false);
+		document.oncontextmenu = function() { return false; };
+		window.addEventListener("load", render);
+
+		// Autosave
+		window.setInterval(function() {
+			localStorage.setItem("editor-autosave", JSON.stringify(level));
+		}, 5000);
+
+	</script>
+</body>
+</html>
