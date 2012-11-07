@@ -1,7 +1,5 @@
 var assets = {
 	objects: {
-		"ammo-box": { collision: "box", mass: 250, sound: "metal", item: { type: "clips", amount: 2 } },
-		"health-box": { collision: "box", mass: 250, sound: "metal", item: { type: "hp", amount: 25 } },
 		"barrel-blue": { collision: "cylinder", mass: 250, sound: "metal" },
 		"barrel-red": { collision: "cylinder", mass: 250, sound: "metal" },
 		"barrel-rusty": { collision: "cylinder", mass: 250, sound: "metal" },
@@ -9,7 +7,10 @@ var assets = {
 		"trash": { collision: "box", mass: 150 },
 		"turbine": { collision: "box", sound: "metal" }
 	},
-	items: {},
+	items: {
+		"ammo-box": { collision: "box", mass: 250, sound: "metal", item: { type: "clips", amount: 2 } },
+		"health-box": { collision: "box", mass: 250, sound: "metal", item: { type: "hp", amount: 25 } },
+	},
 	monsters: {
 		"robot": {
 			collision: "capsule",

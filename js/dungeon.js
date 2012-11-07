@@ -431,13 +431,11 @@ function Dungeon(scene, player, levelName) {
 
 	this.addItems = function(level) {
 		if (!level.items) return;
-		var pos = new THREE.Vector3();
 		for (var i = 0; i < level.items.length; ++i) {
 			var name = level.items[i].name;
-			pos.copy(level.items[i].position);
-			pos.y = 1.2;
-			cache.loadModel("assets/models/" + name + "/" + name + ".js",
-				objectHandler(level, pos, 0, assets.items[name]));
+			cache.loadModel("assets/items/" + name + "/" + name + ".js",
+				objectHandler(level, new THREE.Vector3().copy(level.items[i].position),
+					level.items[i].angle, assets.items[name]));
 		}
 	};
 
