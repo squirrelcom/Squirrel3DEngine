@@ -92,7 +92,7 @@ tools.object = {
 		currentTool = tools.object;
 		canvas.style.cursor = "crosshair";
 	},
-	object: "barrel",
+	object: "", // Populated from assets.js
 	objects: [], // Populated from assets.js
 	angle: 0,
 	mousedown: function(e) {
