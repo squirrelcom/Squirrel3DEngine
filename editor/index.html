@@ -71,24 +71,25 @@
 		};
 
 		var level = {
+			title: "Untitled",
+			roomHeight: 3,
+			gridSize: 2,
+			width: w,
+			depth: h,
+			map: new Map(w, h, OPEN),
+			start: [ Math.floor(w*0.3)-0.5, Math.floor(h/2)-0.5 ],
+			startAngle: 0,
+			exit: [ Math.floor(w*0.7)-0.5, Math.floor(h/2)-0.5 ],
 			materials: {
 				ceiling: "rock-01",
 				wall: "stone-01",
 				floor: "stone-floor-01"
 			},
-			roomHeight: 3,
-			gridSize: 2,
 			lights: [],
 			objects: [],
 			items: [],
 			monsters: [],
-			triggers: [],
-			start: [ Math.floor(w*0.3)-0.5, Math.floor(h/2)-0.5 ],
-			startAngle: 0,
-			exit: [ Math.floor(w*0.7)-0.5, Math.floor(h/2)-0.5 ],
-			width: w,
-			depth: h,
-			map: new Map(w, h, OPEN)
+			triggers: []
 		};
 		if (hashParams.level)
 			tools["Import level"](hashParams.level);
@@ -248,6 +249,7 @@
 		gui.add(tools.diagonals, "Place diagonal walls");
 
 		var guiMap = gui.addFolder("Map properties");
+		guiMap.add(level, "title");
 		guiMap.add(level.materials, "ceiling", materials);
 		guiMap.add(level.materials, "wall", materials);
 		guiMap.add(level.materials, "floor", materials);

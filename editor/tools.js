@@ -229,6 +229,7 @@ tools["Import level"] = function(json) {
 		return;
 	}
 	level = json;
+	level.title = level.title || "Untitled";
 	level.map = new Map(level.width, level.depth, level.map);
 	level.lights = level.lights || [];
 	level.objects = level.objects || [];

@@ -492,6 +492,7 @@ function Dungeon(scene, player, levelName) {
 			heurestic: PF.Heuristic.euclidean
 		});
 		self.loaded = true;
+		if (level.title) displayMessage(level.title);
 	}
 
 	levelName = levelName || hashParams.level || "test";
