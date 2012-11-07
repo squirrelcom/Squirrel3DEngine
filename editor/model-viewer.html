@@ -74,6 +74,11 @@
 				renderer.gammaOutput = true;
 				renderer.physicallyBasedShading = true;
 
+				var shooter = {
+					"screenshot.png": function() { screenshot(false, false); },
+					"screenshot.jpg": function() { screenshot(false, true); }
+				};
+
 				var gui = new dat.GUI();
 				gui.add(window, "model", objects).onChange(function() {
 					loader.statusDomElement.style.display = "block";
@@ -96,7 +101,8 @@
 				});
 				gui.add(window, "squareCanvas");
 				gui.add(window, "thumbnailCanvas");
-				gui.add(window, "screenshot");
+				gui.add(shooter, "screenshot.jpg");
+				gui.add(shooter, "screenshot.png");
 
 				document.addEventListener('mousedown', function(e) {
 					mouseDragRefX = e.clientX;

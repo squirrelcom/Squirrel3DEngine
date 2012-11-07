@@ -144,9 +144,10 @@ function dumpInfo() {
 	console.log("WebGL info: ", gl_info);
 }
 
-function screenshot(dontDownload) {
-	var dataUrl = renderer.domElement.toDataURL("image/png");
-	if (!dontDownload) dataUrl = dataUrl.replace("image/png", "image/octet-stream");
+function screenshot(dontDownload, useJPG) {
+	var imgtype = useJPG ? "image/jpeg" : "image/png";
+	var dataUrl = renderer.domElement.toDataURL(imgtype);
+	if (!dontDownload) dataUrl = dataUrl.replace(imgtype, "image/octet-stream");
 	window.open(dataUrl, "_blank");
 }
 
