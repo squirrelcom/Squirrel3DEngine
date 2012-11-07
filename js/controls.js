@@ -109,7 +109,7 @@ function Controls(object, handlers, domElement) {
 			case 39: /*right*/
 			case 68: /*D*/ moveRight = true; break;
 			case 82: /*R*/ reload(); break;
-			case 123: /*F12*/ screenshot(); break;
+			case 123: /*F12*/ screenshot(true); break;
 		}
 	};
 
