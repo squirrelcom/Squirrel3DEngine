@@ -81,9 +81,9 @@
 			startAngle: 0,
 			exit: [ Math.floor(w*0.7)-0.5, Math.floor(h/2)-0.5 ],
 			materials: {
-				ceiling: "rock-01",
-				wall: "stone-01",
-				floor: "stone-floor-01"
+				ceiling: "",
+				wall: "",
+				floor: ""
 			},
 			lights: [],
 			objects: [],
@@ -111,6 +111,9 @@
 		var images = {};
 		for (i = 0; i < materials.length; ++i)
 			images[materials[i]] = document.getElementById("tex-" + materials[i]);
+		level.materials.ceiling = materials[0];
+		level.materials.wall = materials[1];
+		level.materials.floor = materials[2];
 
 		// Object gallery
 		for (i in assets.objects) tools.object.objects.push(i);
