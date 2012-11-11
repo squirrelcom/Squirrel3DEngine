@@ -89,21 +89,22 @@ function updateHUD() {
 
 var messageTimer = null;
 function displayMessage(msg) {
+	var elem = $("#message");
 	if (messageTimer)
 		window.clearTimeout(messageTimer);
-	$("#message").html(msg).fadeIn(2000);
+	if (elem.is(':visible')) elem.stop(true, true).hide();
+	elem.html(msg).fadeIn(2000);
 	messageTimer = window.setTimeout(function() {
-		$("#message").fadeOut(5000);
+		elem.fadeOut(5000);
 		messageTimer = null;
-	}, 5000);
+	}, 3000);
 }
 
 function displayMinorMessage(msg) {
 	var elem = $("#minor-messages");
 	if (!elem.is(':visible')) elem.html("");
 	elem.stop(true, true);
-	elem.prepend(msg + "<br/>").show();
-	elem.fadeOut(5000);
+	elem.prepend(msg + "<br/>").show().fadeOut(5000);
 }
 
 function editLevel() {
