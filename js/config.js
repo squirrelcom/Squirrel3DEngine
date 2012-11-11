@@ -22,6 +22,7 @@ var hashParams = (function() {
 var CONFIG = {
 	showStats: true,
 	quarterMode: false,
+	sounds: true,
 	postprocessing: true,
 	particles: true,
 	maxLights: 4,

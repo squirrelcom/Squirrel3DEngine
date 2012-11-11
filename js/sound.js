@@ -28,6 +28,7 @@ function Sound(samples, minPlayers) {
 			this.samples.push(new Audio("assets/sounds/" + samples[i]));
 
 	this.play = function(volume) {
+		if (!CONFIG.sounds) return;
 		var sample = this.samples[this.sampleIndex];
 		if (window.chrome) sample.load(); // Chrome requires reload
 		else sample.currentTime = 0;
