@@ -29,13 +29,14 @@ function init() {
 					pl[i] += other.items[i];
 			}
 			soundManager.play("pick-up");
+			displayMinorMessage("Picked up " + other.itemName);
 			updateHUD();
 			other.items = undefined;
 			other.visible = false;
 			other.parent.remove(other);
 		}
 		if (other.damage) {
-			if (vel.lengthSq() < 1) return;
+			if (vel.lengthSq() < 5) return;
 			this.hp -= other.damage;
 			updateHUD();
 			// Death is checked in render loop

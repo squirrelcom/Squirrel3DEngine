@@ -100,6 +100,7 @@ function Dungeon(scene, player, levelName) {
 			if (def.item) {
 				obj.items = {};
 				obj.items[def.item.type] = def.item.amount || 1;
+				obj.itemName = def.name;
 			}
 
 			// Character collision callbacks

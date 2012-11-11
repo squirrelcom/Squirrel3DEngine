@@ -46,6 +46,20 @@ canvas {
 	transform: perspective(500px) rotateY(25deg);
 }
 
+#minor-messages {
+	position: absolute;
+	top: 40%;
+	left: 5%;
+	color: #800;
+	text-align: left;
+	font-size: 16px;
+	font-family: 'Black Ops One', serif;
+	-webkit-transform: perspective(500px) rotateY(40deg);
+	-moz-transform: perspective(500px) rotateY(40deg);
+	-o-transform: perspective(500px) rotateY(40deg);
+	transform: perspective(500px) rotateY(40deg);
+}
+
 #hud {
 	position: absolute;
 	top: 60%;

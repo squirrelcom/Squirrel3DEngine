@@ -105,6 +105,14 @@ function displayMessage(msg) {
 	}, 5000);
 }
 
+function displayMinorMessage(msg) {
+	var elem = $("#minor-messages");
+	if (!elem.is(':visible')) elem.html("");
+	elem.stop(true, true);
+	elem.prepend(msg + "<br/>").show();
+	elem.fadeOut(5000);
+}
+
 function editLevel() {
 	var url = "editor/index.html#level=" + window.btoa(dungeon.serialize());
 	window.open(url, "_blank");

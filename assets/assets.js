@@ -9,8 +9,8 @@ var assets = {
 		"turbine": { collision: "box", sound: "metal" }
 	},
 	items: {
-		"ammo-box": { collision: "box", mass: 250, sound: "metal", item: { type: "clips", amount: 2 } },
-		"health-box": { collision: "box", mass: 250, sound: "metal", item: { type: "hp", amount: 25 } },
+		"ammo-box": { name: "ammo", collision: "box", mass: 250, sound: "metal", item: { type: "clips", amount: 2 } },
+		"health-box": { name: "health pack", collision: "box", mass: 250, sound: "metal", item: { type: "hp", amount: 25 } },
 	},
 	monsters: {
 		"robot": {
