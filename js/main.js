@@ -157,25 +157,30 @@ function shoot(pos, rot, off, flip) {
 	fork.visible = true;
 }
 
+var reloading = false;
 function reload() {
-	if (pl.bullets >= pl.bulletsPerClip) return;
+	if (reloading || pl.bullets >= pl.bulletsPerClip) return;
 	if (pl.clips <= 0) {
 		displayMinorMessage("Out of ammo");
 		return;
 	}
-	pl.bullets = pl.bulletsPerClip;
-	--pl.clips;
-	updateHUD();
+	reloading = true;
+	window.setTimeout(function() {
+		pl.bullets = pl.bulletsPerClip;
+		--pl.clips;
+		updateHUD();
+		reloading = false;
+	}, 2000);
 	soundManager.play("reload");
 }
 
 var projector = new THREE.Projector();
 function mouseHandler(button) {
-	if (button == 0 && pl.rhand && pl.bullets <= 0) {
+	if (button == 0 && pl.rhand && pl.bullets <= 0 && !reloading) {
 		// Clip empty, force reload if there is more
 		soundManager.play("shoot-dry");
 		reload();
-	} else if (button == 0 && pl.rhand && pl.bullets > 0) {
+	} else if (button == 0 && pl.rhand && pl.bullets > 0 && !reloading) {
 		// Shoot!
 		--pl.bullets;
 		shoot(pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
