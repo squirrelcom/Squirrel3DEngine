@@ -376,6 +376,172 @@ function LightManager(params) {
 
 	};
 }
+
+function AnimationManager() {
+	this.anims = [];
+}
+
+AnimationManager.prototype.createAnimatedMesh = function(geometry, material, def) {
+	var obj;
+	// Handle material animation stuff
+	for (var m = 0; m < geometry.materials.length; ++m) {
+		if (def.animation.type === "morph") {
+			geometry.materials[m].morphTargets = true;
+			geometry.materials[m].morphNormals = true;
+		} else if (def.animation.type === "bones") {
+			geometry.materials[m].skinning = true;
+		}
+	}
+	// Create the mesh
+	if (def.animation.type === "morph") {
+		geometry.computeMorphNormals();
+		obj = new THREE.MorphAnimMesh(geometry, material);
+		obj.duration = def.animation.duration;
+		obj.time = obj.duration * Math.random();
+	} else if (def.animation.type === "bones") {
+		obj = new THREE.SkinnedMesh(geometry, material); // TODO: useVertexTexture?
+		THREE.AnimationHandler.add(geometry.animation);
+		obj.animation = new THREE.Animation(obj, "walk");
+	}
+	this.anims.push(obj);
+	return obj;
+};
+
+AnimationManager.prototype.update = function(dt) {
+	for (var i = 0; i < this.anims.length; ++i) {
+		var obj = this.anims[i];
+		// Update SkinnedMesh animation state
+		if (obj.animation) {
+			if (!obj.animation.isPlaying && obj.animate) obj.animation.play();
+			else if (obj.animation.isPlaying && !obj.animate) obj.animation.stop();
+		}
+		if (obj.dead) continue;
+		// Update morph animation
+		if (obj.updateAnimation && obj.animate)
+			obj.updateAnimation(dt * 1000);
+	}
+	// Update skinned animations
+	THREE.AnimationHandler.update(dt * 1000);
+};
+
+function AIManager() {
+	var timeAccumulator = 0;
+
+	var v = new THREE.Vector3();
+
+	function walkTowards(monster, pos, sq_thres, dt) {
+		v.copy(pos);
+		v.subSelf(monster.position);
+		v.y = 0;
+		monster.mesh.lookAt(v.normalize());
+		if (monster.position.distanceToSquared(pos) >= sq_thres) {
+			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
+			monster.mesh.animate = true;
+			return false;
+		} else {
+			monster.setLinearVelocity(v.set(0, 0, 0));
+			monster.mesh.animate = false;
+			return true;
+		}
+	}
+
+	this.process = function(dt) {
+		// AI processing doesn't need to run each loop
+		timeAccumulator += dt;
+		if (timeAccumulator < 0.050) return;
+		else timeAccumulator = 0;
+
+		var i, j;
+		var gridSize = dungeon.level.gridSize;
+		// TODO: Should probably keep own collection
+		for (i = 0; i < dungeon.monsters.length; ++i) {
+			var monster = dungeon.monsters[i];
+			if (monster.dead) continue;
+
+			// Does the monster see player?
+			if (dungeon.level.map.raycast(
+				monster.position.x / gridSize, monster.position.z / gridSize,
+				pl.position.x / gridSize, pl.position.z / gridSize))
+			{
+				// Mark as active
+				monster.activated = true;
+				monster.waypoints = null; // Clear waypoints
+				// Look at player
+				walkTowards(monster, pl.position, 12, dt);
+				// Shoot?
+				if (Math.random() < 0.05) {
+					shoot(monster.position, monster.mesh.rotation, v.set(0, 0.11, -1.2), true);
+				}
+
+			// Target lost? Let's find a path
+			} else if (monster.activated && !monster.waypoints) {
+				var path = dungeon.pathFinder.findPath(
+					(monster.position.x / gridSize)|0, (monster.position.z / gridSize)|0,
+					(pl.position.x / gridSize)|0, (pl.position.z / gridSize)|0,
+					dungeon.grid.clone());
+				monster.waypoints = [];
+				//path = PF.Util.smoothenPath(dungeon.grid, path);
+				for (j = 0; j < path.length; ++j) {
+					v.set((path[j][0] + 0.5) * gridSize, monster.position.y, (path[j][1] + 0.5) * gridSize);
+					monster.waypoints.push(v.clone());
+				}
+			}
+
+			// Does the monster have waypoints?
+			if (monster.waypoints) {
+				if (!monster.waypoints.length)
+					monster.waypoints = null;
+				else if (walkTowards(monster, monster.waypoints[0], 1, dt)) {
+					// Move on to the next waypoint
+					monster.waypoints.splice(0, 1);
+				}
+			}
+		}
+	};
+
+}
+
+
+
+
+function SoundManager() {
+	var sounds = {};
+	for (var s in assets.sounds)
+		sounds[s] = new Sound(assets.sounds[s], 5);
+
+	this.play = function(name) {
+		sounds[name].play();
+	};
+
+	this.playSpatial = function(name, position, radius) {
+		// Hack: Should have an update method instead of using a global reference
+		var distance = pl.camera.position.distanceTo(position);
+		if (distance < radius)
+			sounds[name].play(1 - distance / radius);
+	};
+}
+
+function Sound(samples, minPlayers) {
+	if (typeof samples === "string") samples = [ samples ];
+	minPlayers = minPlayers || 1;
+
+	this.sampleIndex = 0;
+	this.samples = [];
+
+	while (this.samples.length < minPlayers)
+		for (var i = 0; i < samples.length; ++i)
+			this.samples.push(new Audio("assets/sounds/" + samples[i]));
+
+	this.play = function(volume) {
+		var sample = this.samples[this.sampleIndex];
+		if (window.chrome) sample.load(); // Chrome requires reload
+		else sample.currentTime = 0;
+		if (volume !== undefined)
+			sample.volume = volume;
+		sample.play();
+		this.sampleIndex = (this.sampleIndex + 1) % this.samples.length;
+	};
+}
 "use strict";
 var _textures = [];
 
@@ -449,7 +615,7 @@ function updateMaterials() {
 
 function createMaterial(name) {
 	var texture_path = "assets/textures/";
-	var ambient = 0x333333, diffuse = 0xbbbbbb, specular = 0xffffff, shininess = 30, scale = 1.0;
+	var ambient = 0xaaaaaa, diffuse = 0xaaaaaa, specular = 0xffffff, shininess = 30, scale = 1.0;
 	/*var shader = THREE.ShaderUtils.lib["normal"];
 	var uniforms = THREE.UniformsUtils.clone(shader.uniforms);
 
@@ -522,8 +688,10 @@ function dumpInfo() {
 	console.log("WebGL info: ", gl_info);
 }
 
-function screenshot() {
-	var dataUrl = renderer.domElement.toDataURL("image/png");
+function screenshot(dontDownload, useJPG) {
+	var imgtype = useJPG ? "image/jpeg" : "image/png";
+	var dataUrl = renderer.domElement.toDataURL(imgtype);
+	if (!dontDownload) dataUrl = dataUrl.replace(imgtype, "image/octet-stream");
 	window.open(dataUrl, "_blank");
 }
 
@@ -602,7 +770,7 @@ function createSimpleFire(position) {
 
 
 // Create a teleporter emitter
-var _novaTexture = loadTexture("assets/particles/nova.png", { alpha: true });
+var _novaTexture = null; //loadTexture("assets/particles/nova.png", { alpha: true });
 function createTeleporterParticles(position) {
 	var emitter = Fireworks.createEmitter({ nParticles: 30 });
 	emitter.effectsStackBuilder()
@@ -619,7 +787,7 @@ function createTeleporterParticles(position) {
 
 
 // Create a torch fire emitter
-var _fireTexture = loadTexture("assets/particles/flame.png", { alpha: true });
+var _fireTexture = null; //loadTexture("assets/particles/flame.png", { alpha: true });
 function createTexturedFire(parent) {
 	var numSprites = 8;
 	var emitter = Fireworks.createEmitter({ nParticles: 20 });
@@ -748,14 +916,14 @@ function Controls(object, handlers, domElement) {
 		event.preventDefault();
 		if (this.domElement !== document) this.domElement.focus();
 		if (this.pointerLockEnabled) event.stopPropagation();
-		if (this.mouseEnabled && this.handlers.mouse)
+		if (this.mouseEnabled && this.active && this.handlers.mouse && this.pointerLockEnabled)
 			this.handlers.mouse(event.button);
 	};
 
 	this.onMouseUp = function (event) {
 		event.preventDefault();
 		if (this.pointerLockEnabled) event.stopPropagation();
-		if (this.mouseEnabled) {
+		if (this.mouseEnabled && this.active) {
 			switch (event.button) {
 				case 0: break;
 				case 2: break;
@@ -765,6 +933,7 @@ function Controls(object, handlers, domElement) {
 
 	this.onMouseMove = function (event) {
 		function limit(a, lo, hi) { return a < lo ? lo : (a > hi ? hi : a); }
+		if (!this.mouseEnabled || !this.active) return;
 		if (this.pointerLockEnabled) {
 			if (event.mozMovementX === 0 && event.mozMovementY === 0) return; // Firefox fires 0-movement event right after real one
 			this.mouseX = event.movementX || event.webkitMovementX || event.mozMovementX || 0;
@@ -791,8 +960,9 @@ function Controls(object, handlers, domElement) {
 			case 83: /*S*/ moveBackward = true; break;
 			case 39: /*right*/
 			case 68: /*D*/ moveRight = true; break;
-			case 81: /*Q*/ this.active = !this.active; break;
-			case 123: /*F12*/ screenshot(); break;
+			case 82: /*R*/ reload(); break;
+			case 70: /*F*/ pl.shadow.visible = !pl.shadow.visible; break;
+			case 123: /*F12*/ screenshot(true); break;
 		}
 	};
 
@@ -884,86 +1054,59 @@ function Controls(object, handlers, domElement) {
 };
 var assets = {
 	objects: {
-		"fern-01": { randScale: 0.3, noShadows: true },
-		"fern-02": { randScale: 0.3, noShadows: true },
-		"plant-01": { randScale: 0.3, noShadows: true },
-		"plant-02": { randScale: 0.3, noShadows: true },
-		"plant-03": { randScale: 0.3, noShadows: true },
-		"plant-04": { randScale: 0.3, noShadows: true },
-		"plant-05": { randScale: 0.3, noShadows: true },
-		"rock-01": { collision: "sphere", mass: 400, randScale: 0.4 },
-		"rock-02": { collision: "box", mass: 400, randScale: 0.4 },
-		"rock-03": { collision: "box", mass: 400, randScale: 0.4 },
-		"rock-04": { collision: "box", mass: 500, randScale: 0.4 },
-		"barrel": { collision: "cylinder", mass: 250 },
-		"box": { collision: "box", mass: 150 },
-		"bucket-broken": { collision: "cylinder", mass: 50 },
-		"netted-jar": { collision: "cylinder", mass: 100 },
-		"vase-01": { collision: "cylinder", mass: 75 },
-		"table-big": { collision: "box", mass: 1000 },
-		"table-old": { collision: "box", mass: 800 },
-		"chair-01": { collision: "box", mass: 200 },
-		"bench-church": { collision: "box", mass: 1000 },
-		"torch-standing": { collision: "cylinder", mass: 150 },
-		"mine-cart": { collision: "box", mass: 900 },
-		"obelisk-01": { collision: "box", mass: 0 },
-		"obelisk-02": { collision: "box", mass: 0 },
-		"pillar-broken-01": { collision: "cylinder", mass: 0 },
-		"pillar-broken-02": { collision: "cylinder", mass: 0 },
-		"pillar-greek": { collision: "cylinder", mass: 0 },
-		"forge": { collision: "concave", mass: 0 },
-		"door-barred": { collision: "box", mass: 400, door: true },
-		"teleporter": { collision: "cylinder", mass: 0 }
+		"barrel-blue": { collision: "cylinder", mass: 250, sound: "metal" },
+		"barrel-red": { collision: "cylinder", mass: 250, sound: "metal" },
+		"barrel-rusty": { collision: "cylinder", mass: 250, sound: "metal" },
+		"gas-tank": { collision: "cylinder", mass: 350, sound: "metal" },
+		"military-box": { collision: "box", mass: 200, sound: "metal" },
+		"trash": { collision: "box", mass: 150 },
+		"turbine": { collision: "box", sound: "metal" }
 	},
 	items: {
-		"key": {},
-		"knife": {},
-		"health-potion": {},
-		"mana-potion": {}
-	},
-	materials: {
-		"rock-01": { roughness: 0.15 },
-		"rock-02": { roughness: 0.15 },
-		"rock-03": { roughness: 0.15 },
-		"rock-04": { roughness: 0.15 }
+		"ammo-box": { name: "ammo", collision: "box", mass: 250, sound: "metal", item: { type: "clips", amount: 2 } },
+		"health-box": { name: "health pack", collision: "box", mass: 250, sound: "metal", item: { type: "hp", amount: 25 } },
 	},
 	monsters: {
-		"cerberus": { collision: "box", character: { speed: 120 }, animation: { duration: 750 } },
-		"spider": { collision: "box", character: { speed: 120 }, animation: { duration: 750 } },
-		"minotaur": { collision: "box", character: { speed: 400 }, animation: { duration: 750 } }
-	},
-	environments: {
-		"cave": {
-			wall: [ "rock-01", "rock-02", "rock-03", "rock-04" ],
-			floor: [ "sand-01", "sand-02", "sand-03", "sand-04" ],
-			ceiling: [ "rock-01", "rock-02", "rock-03", "rock-04" ],
-			objects: [ "rock-01", "rock-02", "rock-03", "rock-04" ]
-		},
-		"mine": {
-			wall: [ "rock-01", "rock-02", "rock-03", "rock-04" ],
-			floor: [ "rock-01", "rock-02", "rock-03", "rock-04" ],
-			ceiling: [ "rock-01", "rock-02", "rock-03", "rock-04" ],
-			objects: [ "mine-cart", "rock-01", "rock-02", "rock-03", "rock-04", "barrel", "box", "netted-jar", "table-old" ]
-		},
-		"dungeon": {
-			wall: [ "stone-01", "stone-02", "stone-03" ],
-			floor: [ "stone-floor-02", "stone-floor-05" ],
-			ceiling: [ "stone-01" ],
-			objects: [ "barrel", "box", "netted-jar", "table-old", "chair-01" ]
-		},
-		"castle": {
-			wall: [ "stone-01", "tiles-01", "tiles-02" ],
-			floor: [ "stone-floor-01", "stone-floor-03", "stone-floor-04", "stone-floor-06", "wood-floor-01" ],
-			ceiling: [ "stone-01" ],
-			objects: [ "barrel", "netted-jar", "table-big", "chair-01" ]
-		},
-		"temple": {
-			wall: [ "stone-01", "tiles-01", "tiles-02" ],
-			floor: [ "stone-floor-01", "stone-floor-03", "stone-floor-04", "stone-floor-06", "wood-floor-01" ],
-			ceiling: [ "stone-01" ],
-			objects: [ "pillar-greek", "pillar-greek", "netted-jar", "table-old", "chair-01" ]
+		"robot": {
+			collision: "capsule",
+			character: { speed: 120, hp: 50 },
+			animation: { type: "morph", duration: "1000" },
+			sound: "metal"
 		}
-	}
+	},
+	lights: {
+		"ceiling-lamp": { type: "ceiling", offset: { x: 0, y: -0.2, z: 0 } }
+	},
+	sounds: {
+		"shoot": [ "fork-launch.wav" ],
+		"shoot-dry": [ "empty-gun.wav" ],
+		"reload": [ "reload.wav" ],
+		"pick-up": [ "pick-up.wav" ],
+		"metal": [ "metal-1.wav", "metal-2.wav", "metal-3.wav" ],
+		"robot-death": [ "robot-death.wav" ]
+	},
+	materials: {
+		"metal-01": { repeat: 2 },
+		"metal-02": {},
+		"metal-03": {},
+		"metal-bumps-01": { repeat: 2 },
+		"metal-bumps-02": {},
+		"metal-bumps-03": {},
+		"metal-colored-01": {},
+		"metal-colored-02": {},
+		"metal-colored-03": {},
+		"metal-colored-04": {},
+		"metal-colored-05": {},
+		"metal-colored-06": {},
+		"metal-colored-07": {},
+		"metal-colored-08": {},
+		"metal-colored-09": {},
+		"metal-corrugated-01": {},
+		"metal-corrugated-02": {},
+		"metal-worn-01": {},
+		"metal-worn-02": {},
+	},
+	environments: {}
 };
 "use strict";
 var VOID = " ";
@@ -1027,6 +1170,36 @@ function Map(w, h, data) {
 
 	this.fill = function(x, y, target, filler, skip) {
 		floodFill(this, x, y, target, filler, skip);
+	};
+
+	function distSq(x1, y1, x2, y2) {
+		var dx = x2 - x1, dy = y2 - y1;
+		return dx * dx + dy * dy;
+	}
+
+	this.raycast = function(x1, y1, x2, y2, step) {
+		step = step || 0.5;
+		var angle = Math.atan2(y2 - y1, x2 - x1);
+		var dx = Math.cos(angle) * step;
+		var dy = Math.sin(angle) * step;
+		while (distSq(x1, y1, x2, y2) > step * step) {
+			if (this.map[(y1|0) * w + (x1|0)] == WALL)
+				return false;
+			x1 += dx;
+			y1 += dy;
+		}
+		return true;
+	};
+
+	this.getWalkableMatrix = function() {
+		var grid = new Array(h);
+		for (var j = 0; j < h; ++j) {
+			grid[j] = [];
+			for (var i = 0; i < w; ++i) {
+				grid[j].push(this.map[j * w + i] == WALL ? 1 : 0);;
+			}
+		}
+		return grid;
 	};
 
 }
@@ -1237,8 +1410,12 @@ function Dungeon(scene, player, levelName) {
 	this.loaded = false;
 	this.objects = [];
 	this.monsters = [];
-	var dummy_material = new THREE.MeshBasicMaterial({color: 0x000000});
-	var debug_material = new THREE.MeshBasicMaterial({color: 0xff00ff});
+	this.grid = null;
+	this.pathFinder = null;
+	this.level = null;
+	var dummy_material = new THREE.MeshBasicMaterial({ color: 0x000000 });
+	var debug_material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
+	var dead_material = new THREE.MeshLambertMaterial({ color: 0x222222, ambient: 0x222222 });
 
 	function objectHandler(level, pos, ang, def) {
 		return function(geometry) {
@@ -1252,17 +1429,12 @@ function Dungeon(scene, player, levelName) {
 				scale += randf(-def.randScale, def.randScale);
 				mass *= scale;
 			}
-			if (def.animation) geometry.computeMorphNormals();
 			if (!geometry.boundingBox) geometry.computeBoundingBox();
 
-			// Handle materials
-			for (var m = 0; m < geometry.materials.length; ++m) {
+			// Fix anisotropy
+			for (var m = 0; m < geometry.materials.length; ++m)
 				fixAnisotropy(geometry.materials[m]);
-				if (def.animation) {
-					geometry.materials[m].morphTargets = true;
-					geometry.materials[m].morphNormals = true;
-				}
-			}
+
 			var mat = geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0];
 
 			// Mesh creation
@@ -1278,6 +1450,8 @@ function Dungeon(scene, player, levelName) {
 					obj = new Physijs.CylinderMesh(geometry, material, mass);
 				else if (def.collision == "cone")
 					obj = new Physijs.ConeMesh(geometry, material, mass);
+				else if (def.collision == "capsule")
+					obj = new Physijs.CapsuleMesh(geometry, material, mass);
 				else if (def.collision == "convex")
 					obj = new Physijs.ConvexMesh(geometry, material, mass);
 				else if (def.collision == "concave")
@@ -1316,16 +1490,52 @@ function Dungeon(scene, player, levelName) {
 			// Handle animated meshes
 			if (def.animation) {
 				obj.visible = false;
-				self.monsters.push(obj);
-				obj.mesh = new THREE.MorphAnimMesh(geometry, mat);
-				obj.mesh.duration = def.animation.duration;
-				obj.mesh.time = obj.mesh.duration * Math.random();
+				obj.mesh = animationManager.createAnimatedMesh(geometry, mat, def);
 				if (!def.noShadows) {
 					obj.mesh.castShadow = true;
 					obj.mesh.receiveShadow = true;
 				}
 				obj.add(obj.mesh);
 			}
+
+			if (def.character) {
+				if (def.character.hp) obj.hp = def.character.hp;
+				self.monsters.push(obj);
+			}
+
+			if (def.item) {
+				obj.items = {};
+				obj.items[def.item.type] = def.item.amount || 1;
+				obj.itemName = def.name;
+			}
+
+			// Character collision callbacks
+			obj.addEventListener('collision', function(other, vel, rot) {
+				if (vel.lengthSq() < 1) return;
+				if (other.damage && def.sound)
+					soundManager.playSpatial(def.sound, other.position, 10);
+				if (this.dead) return;
+				if (this.hp && other.damage) {
+					this.hp -= other.damage;
+					// Check for death
+					if (this.hp <= 0) {
+						soundManager.playSpatial("robot-death", 20);
+						this.dead = true;
+						this.mesh.animate = false;
+						this.setAngularFactor({ x: 1, y: 1, z: 1 });
+						this.mass = 2000;
+						this.mesh.material = dead_material;
+					} else {
+						// Hit effect
+						// TODO: Can't do this because the material is shared
+						//var mats = this.mesh.geometry.materials, m;
+						//for (m = 0; m < mats.length; ++m) {
+						//	mats[m].color.r += 0.05;
+						//	mats[m].ambient.r += 0.05;
+						//}
+					}
+				}
+			});
 
 			// Finalize
 			scene.add(obj);
@@ -1357,13 +1567,11 @@ function Dungeon(scene, player, levelName) {
 	this.generateMesh = function(level) {
 		var sqrt2 = Math.sqrt(2);
 		var block_mat = cache.getMaterial(level.materials.wall);
-		var block_params = {};
-		if (assets.materials[level.materials.wall] && assets.materials[level.materials.wall].roughness)
-			block_params.roughness = assets.materials[level.materials.wall].roughness;
+		var block_params = assets.materials[level.materials.wall] || {};
 
 		// Level geometry
 		var geometry = new THREE.Geometry(), mesh;
-		var cell, px, nx, pz, nz, py, ny, tess, cube, hash, rot;
+		var cell, px, nx, pz, nz, py, ny, tess, cube, hash, rot, repeat;
 		for (var j = 0; j < level.depth; ++j) {
 			for (var i = 0; i < level.width; ++i) {
 				px = nx = pz = nz = py = ny = 0;
@@ -1378,10 +1586,11 @@ function Dungeon(scene, player, levelName) {
 					hash = px + nx + pz + nz;
 					if (hash === 0) continue;
 					tess = block_params.roughness ? 10 : 0;
+					repeat = block_params.repeat || 1;
 					rot = 0;
 					if (cell === DIAG && (hash == 5 || hash == 6 || hash == 9 || hash == 10)) {
 						cube = new PlaneGeometry(level.gridSize * sqrt2, level.roomHeight, tess, tess,
-							"px", level.gridSize * sqrt2 / 2, level.roomHeight / 2, block_params.roughness);
+							"px", level.gridSize * sqrt2 / 2 * repeat, level.roomHeight / 2 * repeat, block_params.roughness);
 						if (hash == 5) rot = -45 / 180 * Math.PI;
 						else if (hash == 6) rot = -135 / 180 * Math.PI;
 						else if (hash == 9) rot = 45 / 180 * Math.PI;
@@ -1391,7 +1600,7 @@ function Dungeon(scene, player, levelName) {
 						cube = new BlockGeometry(level.gridSize, level.roomHeight, level.gridSize,
 							tess, tess, tess, block_mat,
 							{ px: px, nx: nx, py: 0, ny: 0, pz: pz, nz: nz },
-							level.gridSize/2, level.roomHeight/2, block_params.roughness);
+							level.gridSize/2 * repeat, level.roomHeight/2 * repeat, block_params.roughness);
 					}
 					mesh = new THREE.Mesh(cube);
 					mesh.position.x = (i + 0.5) * level.gridSize;
@@ -1427,21 +1636,24 @@ function Dungeon(scene, player, levelName) {
 			}
 		}
 
-		// Ceiling, no collision needed
-		var ceiling_plane = new THREE.Mesh(
+		// Ceiling
+		repeat = assets.materials[level.materials.ceiling] ? assets.materials[level.materials.ceiling].repeat || 1 : 1;
+		var ceiling_plane = new Physijs.PlaneMesh(
 			new PlaneGeometry(level.gridSize * level.width, level.gridSize * level.depth,
-				1, 1, "ny", level.width, level.depth),
-			cache.getMaterial(level.materials.ceiling)
+				1, 1, "ny", level.width * repeat, level.depth * repeat),
+			Physijs.createMaterial(cache.getMaterial(level.materials.ceiling), 0.9, 0.0), // friction, restitution
+			0 // mass
 		);
 		ceiling_plane.position.set(level.gridSize * level.width * 0.5, level.roomHeight, level.gridSize * level.depth * 0.5);
 		ceiling_plane.matrixAutoUpdate = false;
 		ceiling_plane.updateMatrix();
 		scene.add(ceiling_plane);
 
-		// Floor with collision
+		// Floor
+		repeat = assets.materials[level.materials.floor] ? assets.materials[level.materials.floor].repeat || 1 : 1;
 		var floor_plane = new Physijs.PlaneMesh(
 			new PlaneGeometry(level.gridSize * level.width, level.gridSize * level.depth,
-				1, 1, "py", level.width, level.depth),
+				1, 1, "py", level.width * repeat, level.depth * repeat),
 			Physijs.createMaterial(cache.getMaterial(level.materials.floor), 0.9, 0.0), // friction, restitution
 			0 // mass
 		);
@@ -1460,11 +1672,11 @@ function Dungeon(scene, player, levelName) {
 		scene.add(mesh);
 
 		// Exit
-		cache.loadModel("assets/models/teleporter/teleporter.js",
-			objectHandler(level, new THREE.Vector3().set(level.exit[0], null, level.exit[1]), 0, assets.objects.teleporter));
-		if (CONFIG.particles)
-			this.exitParticles = createTeleporterParticles(
-				new THREE.Vector3(level.exit[0] * level.gridSize, 0.5, level.exit[1] * level.gridSize));
+		//cache.loadModel("assets/models/teleporter/teleporter.js",
+		//	objectHandler(level, new THREE.Vector3().set(level.exit[0], null, level.exit[1]), 0, assets.objects.teleporter));
+		//if (CONFIG.particles)
+		//	this.exitParticles = createTeleporterParticles(
+		//		new THREE.Vector3(level.exit[0] * level.gridSize, 0.5, level.exit[1] * level.gridSize));
 	};
 
 	this.addLights = function(level) {
@@ -1474,11 +1686,11 @@ function Dungeon(scene, player, levelName) {
 				for (var m = 0; m < geometry.materials.length; ++m)
 					fixAnisotropy(geometry.materials[m]);
 				var mat = geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0];
-				var obj = new THREE.Mesh(geometry, mat);
+				var obj = new Physijs.CylinderMesh(geometry, mat, 0);
 				obj.position.copy(pos);
 				obj.rotation.y = rot;
-				obj.castShadow = true;
-				obj.receiveShadow = true;
+				//obj.castShadow = true;
+				//obj.receiveShadow = true;
 				obj.matrixAutoUpdate = false;
 				obj.updateMatrix();
 				scene.add(obj);
@@ -1486,7 +1698,7 @@ function Dungeon(scene, player, levelName) {
 		}
 
 		// Ambient
-		scene.add(new THREE.AmbientLight(0xaaaaaa));
+		scene.add(new THREE.AmbientLight(0x444444));
 
 		// Point lights
 		var vec = new THREE.Vector2();
@@ -1497,11 +1709,11 @@ function Dungeon(scene, player, levelName) {
 			// Actual light
 			var light = new THREE.PointLight(0xffffaa, 1, 2 * level.gridSize);
 			light.position.copy(level.lights[i].position);
-			var torch = "assets/models/torch/torch.js";
+			var name = "ceiling-lamp";
 
 			// Snap to wall
 			// Create wall candidates for checking which wall is closest to the light
-			vec.set(level.lights[i].position.x|0, level.lights[i].position.z|0);
+			/*vec.set(level.lights[i].position.x|0, level.lights[i].position.z|0);
 			var candidates = [
 				{ x: vec.x + 0.5, y: vec.y, a: Math.PI },
 				{ x: vec.x + 1.0, y: vec.y + 0.5, a: Math.PI/2 },
@@ -1523,16 +1735,16 @@ function Dungeon(scene, player, levelName) {
 			vec.subSelf(snapped).multiplyScalar(2);
 			// Check if there actually is a wall
 			if (level.map.get((light.position.x - vec.x * 0.5)|0, (light.position.z - vec.y * 0.5)|0) == WALL) {
+				// Switch to wall light
+				//name = "wall-lamp";
 				// Move out of the wall
 				light.position.x += vec.x * 0.08;
 				light.position.z += vec.y * 0.08;
 				target.set(light.position.x + vec.x , light.position.y - 1, light.position.z + vec.y);
-			} else {
-				// Switch to ceiling hanging light
-				torch = Math.random() < 0.5 ? "assets/models/torch-hanging-01/torch-hanging-01.js"
-					: "assets/models/torch-hanging-02/torch-hanging-02.js";
+			} else*/ {
+				// Center the ceiling hanging light to grid cell
 				light.position.x = (level.lights[i].position.x|0) + 0.5;
-				light.position.y = level.roomHeight - 0.9;
+				light.position.y = level.roomHeight;
 				light.position.z = (level.lights[i].position.z|0) + 0.5;
 				target.copy(light.position);
 				target.y -= 1;
@@ -1542,6 +1754,8 @@ function Dungeon(scene, player, levelName) {
 			light.position.z *= level.gridSize;
 			target.x *= level.gridSize;
 			target.z *= level.gridSize;
+			var modelPos = new THREE.Vector3().copy(light.position);
+			if (assets.lights[name].offset) light.position.addSelf(assets.lights[name].offset);
 			light.matrixAutoUpdate = false;
 			light.updateMatrix();
 			scene.add(light);
@@ -1569,19 +1783,20 @@ function Dungeon(scene, player, levelName) {
 			lightManager.addShadow(light2);
 
 			// Mesh
-			cache.loadModel(torch, torchHandler(new THREE.Vector3().copy(light.position), snapped.a));
+			cache.loadModel("assets/models/" + name + "/" + name + ".js", torchHandler(modelPos, 0/*snapped.a*/));
 
 			// Flame
-			if (CONFIG.particles)
-				light.emitter = createTexturedFire(light);
+			//if (CONFIG.particles)
+			//	light.emitter = createTexturedFire(light);
 		}
 
 		// Player's torch
 		player.light = new THREE.PointLight(0xccccaa, 1, level.gridSize * 3);
-		scene.add(player.light);
-		player.shadow = new THREE.SpotLight(player.light.color, player.light.intensity, player.light.distance);
-		player.shadow.angle = Math.PI / 4;
-		player.shadow.onlyShadow = true;
+		player.light.visible = false;
+		//scene.add(player.light);
+		player.shadow = new THREE.SpotLight(player.light.color.getHex(), player.light.intensity, player.light.distance);
+		player.shadow.angle = Math.PI / 8;
+		//player.shadow.onlyShadow = true;
 		player.shadow.castShadow = true;
 		player.shadow.shadowCameraNear = 0.1 * UNIT;
 		player.shadow.shadowCameraFar = 10 * UNIT;
@@ -1606,13 +1821,11 @@ function Dungeon(scene, player, levelName) {
 
 	this.addItems = function(level) {
 		if (!level.items) return;
-		var pos = new THREE.Vector3();
 		for (var i = 0; i < level.items.length; ++i) {
 			var name = level.items[i].name;
-			pos.copy(level.items[i].position);
-			pos.y = 1.2;
-			cache.loadModel("assets/models/" + name + "/" + name + ".js",
-				objectHandler(level, pos, 0, assets.items[name]));
+			cache.loadModel("assets/items/" + name + "/" + name + ".js",
+				objectHandler(level, new THREE.Vector3().copy(level.items[i].position),
+					level.items[i].angle, assets.items[name]));
 		}
 	};
 
@@ -1656,6 +1869,26 @@ function Dungeon(scene, player, levelName) {
 		scene.add(pl);
 		pl.setAngularFactor({ x: 0, y: 0, z: 0 });
 
+		// Player gun
+		cache.loadModel("assets/items/gun/gun.js", function(geometry) {
+			player.rhand = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+			player.rhand.position.copy(player.position);
+			scene.add(player.rhand);
+		});
+
+		// Bullets
+		cache.loadModel("assets/items/fork/fork.js", function(geometry) {
+			self.forks = [];
+			self.forkIndex = 0;
+			for (var i = 0; i < 20; ++i) {
+				var fork = new Physijs.BoxMesh(geometry, geometry.materials[0], 100);
+				fork.damage = 5;
+				self.forks.push(fork);
+				fork.visible = false;
+				scene.add(fork);
+			}
+		});
+
 		self.generateMesh(level);
 		self.addLights(level);
 		self.addObjects(level);
@@ -1663,10 +1896,17 @@ function Dungeon(scene, player, levelName) {
 		self.addMonsters(level);
 		lightManager.update(pl);
 		self.level = level;
+		self.grid = new PF.Grid(level.width, level.depth, level.map.getWalkableMatrix());
+		self.pathFinder = new PF.AStarFinder({
+			allowDiagonal: true,
+			dontCrossCorners: true,
+			heurestic: PF.Heuristic.euclidean
+		});
 		self.loaded = true;
+		if (level.title) displayMessage(level.title);
 	}
 
-	levelName = levelName || hashParams.level || "cave-test";
+	levelName = levelName || hashParams.level || "01-intro";
 	if (levelName == "rand") {
 		var gen = new MapGen();
 		processLevel(gen.generate());
@@ -1702,14 +1942,7 @@ function initUI() {
 	physicsStats.domElement.style.left = '85px';
 	container.appendChild(physicsStats.domElement);
 
-	rendererInfo = document.createElement("div");
-	rendererInfo.style.position = 'absolute';
-	rendererInfo.style.bottom = '0px';
-	rendererInfo.style.left = '170px';
-	rendererInfo.style.color = '#f08';
-	rendererInfo.style.textAlign = 'left';
-	rendererInfo.style.backgroundColor = 'rgba(0, 0, 0, 0.33)';
-	container.appendChild(rendererInfo);
+	rendererInfo = document.getElementById("renderer-info");
 
 	container.requestPointerLock = container.requestPointerLock ||
 			container.mozRequestPointerLock || container.webkitRequestPointerLock;
@@ -1772,15 +2005,30 @@ function initUI() {
 	gui.close();
 }
 
+function updateHUD() {
+	$("#health").html(pl.hp);
+	$("#bullets").html(pl.bullets);
+	$("#clips").html(pl.clips);
+}
+
 var messageTimer = null;
 function displayMessage(msg) {
+	var elem = $("#message");
 	if (messageTimer)
 		window.clearTimeout(messageTimer);
-	$("#message").html(msg).fadeIn(2000);
+	if (elem.is(':visible')) elem.stop(true, true).hide();
+	elem.html(msg).fadeIn(2000);
 	messageTimer = window.setTimeout(function() {
-		$("#message").fadeOut(5000);
+		elem.fadeOut(5000);
 		messageTimer = null;
-	}, 5000);
+	}, 3000);
+}
+
+function displayMinorMessage(msg) {
+	var elem = $("#minor-messages");
+	if (!elem.is(':visible')) elem.html("");
+	elem.stop(true, true);
+	elem.prepend(msg + "<br/>").show().fadeOut(5000);
 }
 
 function editLevel() {
@@ -1809,7 +2057,7 @@ function onPointerLockChange() {
 		$("#instructions").hide();
 	} else {
 		controls.pointerLockEnabled = false;
-		$("#instructions").show();
+		if (!pl.dead) $("#instructions").show();
 	}
 }
 
@@ -1829,7 +2077,7 @@ function reload() {
 var pl, controls, scene, renderer, composer;
 var renderTargetParametersRGBA, renderTargetParametersRGB;
 var colorTarget, depthTarget, depthPassPlugin;
-var lightManager, dungeon;
+var lightManager, animationManager, soundManager, aiManager, dungeon;
 var clock = new THREE.Clock();
 var cache = new Cache();
 var passes = {};
@@ -1848,7 +2096,37 @@ function init() {
 		100
 	);
 	pl.visible = false;
+	pl.addEventListener('collision', function(other, vel, rot) {
+		if (this.dead) return;
+		if (other.items) {
+			for (var i in other.items) {
+				if (pl[i] !== undefined)
+					pl[i] += other.items[i];
+			}
+			soundManager.play("pick-up");
+			displayMinorMessage("Picked up " + other.itemName);
+			updateHUD();
+			other.items = undefined;
+			other.visible = false;
+			other.parent.remove(other);
+		}
+		if (other.damage) {
+			if (vel.lengthSq() < 5) return;
+			this.hp -= other.damage;
+			updateHUD();
+			// Death is checked in render loop
+			// TODO: Hit sound?
+			// TODO: Screen effect?
+		}
+	});
 	// Add pl later to the scene
+
+	// Player stats
+	pl.hp = 100;
+	pl.bulletsPerClip = 15;
+	pl.bullets = pl.bulletsPerClip;
+	pl.clips = 5;
+	updateHUD();
 
 	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1 * UNIT, 30 * UNIT);
 
@@ -1921,25 +2199,82 @@ function init() {
 }
 
 function resetLevel(levelName) {
+	if (levelName == "[credits]") {
+		window.location = "credits.html";
+		return;
+	}
 	// TODO: Reloadless reset?
 	if (dungeon) {
 		if (levelName) window.location.hash = "#level=" + levelName;
 		window.location.reload(true);
 	}
 	lightManager = new LightManager({ maxLights: CONFIG.maxLights, maxShadows: CONFIG.maxShadows });
+	animationManager = new AnimationManager();
+	soundManager = new SoundManager();
+	aiManager = new AIManager();
 	dungeon = new Dungeon(scene, pl, levelName);
 }
 
+var shootVector = new THREE.Vector3();
+function shoot(pos, rot, off, flip) {
+	soundManager.playSpatial("shoot", pos, 20);
+	var fork = dungeon.forks[dungeon.forkIndex];
+	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
+	fork.position.copy(pos);
+	fork.rotation.copy(rot);
+	if (flip) fork.rotation.y += Math.PI;
+	fork.updateMatrixWorld();
+	fork.matrixRotationWorld.extractRotation(fork.matrixWorld);
+	shootVector.set(0, 0, -1);
+	fork.matrixRotationWorld.multiplyVector3(shootVector);
+	fork.translateX(off.x);
+	fork.translateY(off.y);
+	fork.translateZ(off.z);
+	fork.__dirtyPosition = true;
+	fork.__dirtyRotation = true;
+	fork.setLinearVelocity(shootVector.multiplyScalar(25.0));
+	fork.visible = true;
+}
+
+var reloading = false;
+function reload() {
+	if (reloading || pl.bullets >= pl.bulletsPerClip) return;
+	if (pl.clips <= 0) {
+		displayMinorMessage("Out of ammo");
+		return;
+	}
+	reloading = true;
+	window.setTimeout(function() {
+		pl.bullets = pl.bulletsPerClip;
+		--pl.clips;
+		updateHUD();
+		reloading = false;
+	}, 2000);
+	soundManager.play("reload");
+}
+
+var projector = new THREE.Projector();
 function mouseHandler(button) {
-	var _vector = new THREE.Vector3(0, 0, 1);
-	var projector = new THREE.Projector();
-	projector.unprojectVector(_vector, pl.camera);
-	var ray = new THREE.Ray(pl.camera.position, _vector.subSelf(pl.camera.position).normalize());
-	var intersections = ray.intersectObjects(dungeon.objects);
-	if (intersections.length > 0) {
-		var target = intersections[0].object;
-		if (target.position.distanceToSquared(pl.position) < 9)
-			target.applyCentralImpulse(_vector.multiplyScalar(10000));
+	if (button == 0 && pl.rhand && pl.bullets <= 0 && !reloading) {
+		// Clip empty, force reload if there is more
+		soundManager.play("shoot-dry");
+		reload();
+	} else if (button == 0 && pl.rhand && pl.bullets > 0 && !reloading) {
+		// Shoot!
+		--pl.bullets;
+		shoot(pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
+		updateHUD();
+	} else if (button == 2) {
+		// Punch/push
+		shootVector.set(0, 0, 1);
+		projector.unprojectVector(shootVector, pl.camera);
+		var ray = new THREE.Ray(pl.camera.position, shootVector.subSelf(pl.camera.position).normalize());
+		var intersections = ray.intersectObjects(dungeon.objects);
+		if (intersections.length > 0) {
+			var target = intersections[0].object;
+			if (target.position.distanceToSquared(pl.position) < 9)
+				target.applyCentralImpulse(shootVector.multiplyScalar(10000));
+		}
 	}
 }
 
@@ -1948,36 +2283,24 @@ function animate(dt) {
 	function getAnim(time) { return Math.abs(time - (time|0) - 0.5) * 2.0; }
 	function fract(num) { return num - (num|0); }
 	var i, v = new THREE.Vector3();
+	dt = dt < 0.1 ? dt : 0.1;
 
-	for (i = 0; i < dungeon.monsters.length; ++i) {
-		var monster = dungeon.monsters[i];
-		// Look at player
-		v.copy(pl.position);
-		v.subSelf(monster.position);
-		v.y = 0;
-		monster.mesh.lookAt(v.normalize());
-		// Move?
-		if (monster.position.distanceToSquared(pl.position) > 4) {
-			monster.mesh.updateAnimation(1000 * dt);
-			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
-		} else {
-			monster.setLinearVelocity(v.set(0,0,0));
-		}
-	}
+	// Update object animations
+	animationManager.update(dt);
 
 	// Lights
 	var timeNow = new Date().getTime();
 	for (i = 0; i < lightManager.lights.length; ++i) {
 		var light = lightManager.lights[i];
-		var anim = timeNow / (1000.0 + i);
-		light.intensity = 0.5 + 0.5 * getAnim(anim);
+		//var anim = timeNow / (1000.0 + i);
+		//light.intensity = 0.5 + 0.5 * getAnim(anim);
 		if (light.visible && light.emitter)
 			light.emitter.update(dt).render();
 	}
 	if (dungeon.exitParticles) dungeon.exitParticles.update(dt).render();
 
 	// Player light
-	pl.light.intensity = 0.5 + 0.5 * getAnim(timeNow / 1000.0);
+	//pl.light.intensity = 0.5 + 0.5 * getAnim(timeNow / 1000.0);
 	pl.light.position.set(pl.position.x, pl.position.y + 0.2, pl.position.z);
 	pl.shadow.position.copy(pl.light.position);
 	pl.shadow.target.position.copy(controls.target);
@@ -1986,12 +2309,10 @@ function animate(dt) {
 	if (pl.rhand) {
 		pl.rhand.position.set(pl.position.x, pl.position.y, pl.position.z);
 		pl.rhand.rotation.copy(pl.camera.rotation);
-		pl.rhand.updateMatrix();
-		pl.rhand.rotation.y += Math.PI/3;
-		pl.rhand.rotation.z += Math.PI/2;
-		pl.rhand.translateX(0.2*UNIT);
-		pl.rhand.translateY(0.2*UNIT);
-		pl.rhand.translateZ(-0.5*UNIT);
+		//pl.rhand.updateMatrix();
+		pl.rhand.translateX(0.4);
+		pl.rhand.translateY(0.2);
+		pl.rhand.translateZ(-1.0);
 	}
 
 	// Trigger?
@@ -2026,6 +2347,15 @@ $(document).ready(function() {
 		requestAnimationFrame(render);
 		if (!dungeon.loaded) return;
 
+		if (!pl.dead && pl.hp <= 0) {
+			// Oh noes, death!
+			pl.dead = true;
+			controls.active = false;
+			if (!$("#deathscreen").is(':visible'))
+				$("#deathscreen").fadeIn(500);
+			$("#instructions").hide();
+		}
+
 		// Player movement, controls and physics
 		var dt = clock.getDelta();
 		// Take note of the position
@@ -2048,6 +2378,7 @@ $(document).ready(function() {
 		// FIXME: 0.5 below is magic number to rise camera
 		controls.object.position.set(pl.position.x, pl.position.y + 0.5, pl.position.z);
 
+		aiManager.process(dt);
 		animate(dt);
 		lightManager.update(pl);
 		renderer.clear();
@@ -2061,7 +2392,7 @@ $(document).ready(function() {
 			composer.render(dt);
 		} else {
 			renderer.render(scene, pl.camera);
-			if (CONFIG.showStats) rendererInfo.innerHTML = formatRenderInfo();
+			if (CONFIG.showStats) rendererInfo.innerHTML = formatRenderInfo(renderer.info);
 		}
 
 		if (CONFIG.showStats) renderStats.update();
@@ -2069,5 +2400,4 @@ $(document).ready(function() {
 
 	init();
 	render();
-	displayMessage("Welcome.");
 });
