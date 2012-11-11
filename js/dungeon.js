@@ -302,7 +302,7 @@ function Dungeon(scene, player, levelName) {
 			// Actual light
 			var light = new THREE.PointLight(0xffffaa, 1, 2 * level.gridSize);
 			light.position.copy(level.lights[i].position);
-			var torch = "assets/models/ceiling-lamp/ceiling-lamp.js";
+			var name = "ceiling-lamp";
 
 			// Snap to wall
 			// Create wall candidates for checking which wall is closest to the light
@@ -329,7 +329,7 @@ function Dungeon(scene, player, levelName) {
 			// Check if there actually is a wall
 			if (level.map.get((light.position.x - vec.x * 0.5)|0, (light.position.z - vec.y * 0.5)|0) == WALL) {
 				// Switch to wall light
-				//torch = "assets/models/wall-lamp/wall-lamp.js";
+				//name = "wall-lamp";
 				// Move out of the wall
 				light.position.x += vec.x * 0.08;
 				light.position.z += vec.y * 0.08;
@@ -347,6 +347,8 @@ function Dungeon(scene, player, levelName) {
 			light.position.z *= level.gridSize;
 			target.x *= level.gridSize;
 			target.z *= level.gridSize;
+			var modelPos = new THREE.Vector3().copy(light.position);
+			if (assets.lights[name].offset) light.position.addSelf(assets.lights[name].offset);
 			light.matrixAutoUpdate = false;
 			light.updateMatrix();
 			scene.add(light);
@@ -374,7 +376,7 @@ function Dungeon(scene, player, levelName) {
 			lightManager.addShadow(light2);
 
 			// Mesh
-			cache.loadModel(torch, torchHandler(new THREE.Vector3().copy(light.position), 0/*snapped.a*/));
+			cache.loadModel("assets/models/" + name + "/" + name + ".js", torchHandler(modelPos, 0/*snapped.a*/));
 
 			// Flame
 			//if (CONFIG.particles)

@@ -20,6 +20,9 @@ var assets = {
 			sound: "metal"
 		}
 	},
+	lights: {
+		"ceiling-lamp": { type: "ceiling", offset: { x: 0, y: -0.2, z: 0 } }
+	},
 	sounds: {
 		"shoot": [ "fork-launch.wav" ],
 		"shoot-dry": [ "empty-gun.wav" ],
