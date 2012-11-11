@@ -386,10 +386,11 @@ function Dungeon(scene, player, levelName) {
 
 		// Player's torch
 		player.light = new THREE.PointLight(0xccccaa, 1, level.gridSize * 3);
-		scene.add(player.light);
-		player.shadow = new THREE.SpotLight(player.light.color, player.light.intensity, player.light.distance);
-		player.shadow.angle = Math.PI / 4;
-		player.shadow.onlyShadow = true;
+		player.light.visible = false;
+		//scene.add(player.light);
+		player.shadow = new THREE.SpotLight(player.light.color.getHex(), player.light.intensity, player.light.distance);
+		player.shadow.angle = Math.PI / 8;
+		//player.shadow.onlyShadow = true;
 		player.shadow.castShadow = true;
 		player.shadow.shadowCameraNear = 0.1 * UNIT;
 		player.shadow.shadowCameraFar = 10 * UNIT;
