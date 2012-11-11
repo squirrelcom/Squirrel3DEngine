@@ -1,0 +1,494 @@
+{
+	"title": "Fuel Depot",
+	"next": "04-engine-room",
+	"roomHeight": 3,
+	"gridSize": 2,
+	"width": 40,
+	"depth": 40,
+	"map": [
+		"                                        ",
+		"                                        ",
+		"                   ####                 ",
+		"                   #..#                 ",
+		"  ##################..#                 ",
+		"  #...................#                 ",
+		"  #######.######.######                 ",
+		"      #.....# #...#                     ",
+		"      #.....# #...#                     ",
+		"      #.....# #...#                     ",
+		"      #.....# #...#     ########        ",
+		"      #.....# #...#     #%....%#####    ",
+		"      #.....# ##.##     #.........%#    ",
+		"      #.....#  #.#      #..##.##...##   ",
+		"      ###.#####%.%#######..#...#%...%###",
+		"      #....................#...###.....#",
+		"      ######.#######.####..#...#%...%#.#",
+		"           #..#    #.#  #..##.##...###.#",
+		"           #..#    #.#  #..........# #.#",
+		"           ####  ###.#  #%....%#%.%# #.#",
+		"                 #...#  ############ #.#",
+		"                 #...#               #.#",
+		"                 #####          ######.#",
+		"                                #......#",
+		"                                #.######",
+		"                                #.#     ",
+		"                                #.#     ",
+		"                                ###     ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        ",
+		"                                        "
+	],
+	"start": [
+		3.4375,
+		5.5
+	],
+	"startAngle": 0,
+	"exit": [
+		35.625,
+		23.4375
+	],
+	"materials": {
+		"ceiling": "metal-bumps-02",
+		"wall": "metal-colored-03",
+		"floor": "metal-colored-01"
+	},
+	"lights": [
+		{
+			"position": {
+				"x": 9.4375,
+				"z": 8.5
+			}
+		},
+		{
+			"position": {
+				"x": 9.4375,
+				"z": 12.5
+			}
+		},
+		{
+			"position": {
+				"x": 16.4375,
+				"z": 7.4375
+			}
+		},
+		{
+			"position": {
+				"x": 16.5,
+				"z": 11.375
+			}
+		},
+		{
+			"position": {
+				"x": 12.5,
+				"z": 15.5
+			}
+		},
+		{
+			"position": {
+				"x": 20.5,
+				"z": 20.4375
+			}
+		},
+		{
+			"position": {
+				"x": 20.5,
+				"z": 15.4375
+			}
+		},
+		{
+			"position": {
+				"x": 26.5,
+				"z": 15.4375
+			}
+		},
+		{
+			"position": {
+				"x": 29.4375,
+				"z": 15.4375
+			}
+		},
+		{
+			"position": {
+				"x": 28.4375,
+				"z": 11.4375
+			}
+		},
+		{
+			"position": {
+				"x": 28.5,
+				"z": 19.5
+			}
+		},
+		{
+			"position": {
+				"x": 35.5,
+				"z": 15.5625
+			}
+		},
+		{
+			"position": {
+				"x": 7.5,
+				"z": 5.4375
+			}
+		},
+		{
+			"position": {
+				"x": 13.375,
+				"z": 5.5
+			}
+		},
+		{
+			"position": {
+				"x": 19.5625,
+				"z": 5.4375
+			}
+		}
+	],
+	"objects": [
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 7.625,
+				"z": 8.8125
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 7.625,
+				"z": 9.875
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 7.625,
+				"z": 11.9375
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 7.5625,
+				"z": 10.9375
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 11.375,
+				"z": 8.8125
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 11.375,
+				"z": 9.6875
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 11.375,
+				"z": 10.5625
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 11.5,
+				"z": 11.4375
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 8.5625,
+				"z": 9.3125
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 8.5625,
+				"z": 10.375
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 8.5,
+				"z": 11.375
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 8.5,
+				"z": 12.5
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 7.75,
+				"z": 13.125
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 15.4375,
+				"z": 7.375
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 15.4375,
+				"z": 8.0625
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 15.4375,
+				"z": 8.6875
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 15.625,
+				"z": 9.1875
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 15.5,
+				"z": 9.875
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 15.5625,
+				"z": 10.5625
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 15.5625,
+				"z": 11.375
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 17.5,
+				"z": 7.625
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 17.5625,
+				"z": 8.4375
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 17.5,
+				"z": 8.875
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 17.5625,
+				"z": 9.4375
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 17.625,
+				"z": 10.1875
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 17.625,
+				"z": 10.75
+			}
+		},
+		{
+			"name": "barrel-rusty",
+			"position": {
+				"x": 17.625,
+				"z": 11.5625
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 28.5,
+				"z": 14.375
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 30.4375,
+				"z": 14.5625
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 30.4375,
+				"z": 15.5
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 30.5625,
+				"z": 16.5
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 28.5625,
+				"z": 15.4375
+			}
+		},
+		{
+			"name": "gas-tank",
+			"position": {
+				"x": 28.5625,
+				"z": 16.4375
+			}
+		}
+	],
+	"items": [
+		{
+			"name": "health-box",
+			"position": {
+				"x": 18.625,
+				"z": 21.4375
+			}
+		},
+		{
+			"name": "ammo-box",
+			"position": {
+				"x": 21.5,
+				"z": 4.75
+			}
+		},
+		{
+			"name": "ammo-box",
+			"position": {
+				"x": 13.4375,
+				"z": 18.4375
+			}
+		}
+	],
+	"monsters": [
+		{
+			"name": "robot",
+			"position": {
+				"x": 20.8125,
+				"z": 3.9375
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 16.5625,
+				"z": 9.375
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 7.6875,
+				"z": 7.75
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 11.125,
+				"z": 13.1875
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 20.5,
+				"z": 19.625
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 29.5,
+				"z": 14
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 29.4375,
+				"z": 17
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 33.25,
+				"z": 14.125
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 33.3125,
+				"z": 16.75
+			}
+		},
+		{
+			"name": "robot",
+			"position": {
+				"x": 38.5,
+				"z": 17.125
+			}
+		}
+	],
+	"triggers": [
+		{
+			"type": "message",
+			"position": {
+				"x": 6,
+				"z": 5.5
+			},
+			"message": "Probably some more robots ahead..."
+		}
+	]
+}
