@@ -64,7 +64,7 @@ function Controls(object, handlers, domElement) {
 		event.preventDefault();
 		if (this.domElement !== document) this.domElement.focus();
 		if (this.pointerLockEnabled) event.stopPropagation();
-		if (this.mouseEnabled && this.active && this.handlers.mouse)
+		if (this.mouseEnabled && this.active && this.handlers.mouse && this.pointerLockEnabled)
 			this.handlers.mouse(event.button);
 	};
 
