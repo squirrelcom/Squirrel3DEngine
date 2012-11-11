@@ -1,6 +1,6 @@
 body {
 	color: #61443e;
-	font-family: Monospace;
+	font-family: 'Black Ops One', serif;
 	font-size: 13px;
 	text-align:center;
 	background-color: #ffffff;
@@ -19,6 +19,16 @@ canvas {
 	height: 100%;
 }
 
+#renderer-info {
+	position: absolute;
+	bottom: 0px;
+	left: 170px;
+	color: #f08;
+	text-align: left;
+	background-color: rgba(0, 0, 0, 0.33);
+	font-family: monospace;
+}
+
 #instructions {
 	position: absolute;
 	top: 45%;
@@ -26,7 +36,6 @@ canvas {
 	color: #a50;
 	text-align: center;
 	font-size: 18px;
-	font-family: 'Black Ops One', serif;
 	cursor: pointer;
 	display: none;
 }
@@ -39,7 +48,6 @@ canvas {
 	color: #500;
 	text-align: center;
 	font-size: 32px;
-	font-family: 'Black Ops One', serif;
 	-webkit-transform: perspective(500px) rotateY(25deg);
 	-moz-transform: perspective(500px) rotateY(25deg);
 	-o-transform: perspective(500px) rotateY(25deg);
@@ -53,7 +61,6 @@ canvas {
 	color: #800;
 	text-align: left;
 	font-size: 16px;
-	font-family: 'Black Ops One', serif;
 	-webkit-transform: perspective(500px) rotateY(40deg);
 	-moz-transform: perspective(500px) rotateY(40deg);
 	-o-transform: perspective(500px) rotateY(40deg);
@@ -67,7 +74,6 @@ canvas {
 	color: #555;
 	text-align: left;
 	font-size: 32px;
-	font-family: 'Black Ops One', serif;
 	-webkit-transform: perspective(500px) rotateY(40deg);
 	-moz-transform: perspective(500px) rotateY(40deg);
 	-o-transform: perspective(500px) rotateY(40deg);
@@ -100,5 +106,4 @@ canvas {
 	margin: auto;
 	color: #c00;
 	font-size: 32px;
-	font-family: 'Black Ops One', serif;
 }

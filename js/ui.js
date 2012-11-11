@@ -18,14 +18,7 @@ function initUI() {
 	physicsStats.domElement.style.left = '85px';
 	container.appendChild(physicsStats.domElement);
 
-	rendererInfo = document.createElement("div");
-	rendererInfo.style.position = 'absolute';
-	rendererInfo.style.bottom = '0px';
-	rendererInfo.style.left = '170px';
-	rendererInfo.style.color = '#f08';
-	rendererInfo.style.textAlign = 'left';
-	rendererInfo.style.backgroundColor = 'rgba(0, 0, 0, 0.33)';
-	container.appendChild(rendererInfo);
+	rendererInfo = document.getElementById("renderer-info");
 
 	container.requestPointerLock = container.requestPointerLock ||
 			container.mozRequestPointerLock || container.webkitRequestPointerLock;

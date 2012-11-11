@@ -160,7 +160,7 @@ function shoot(pos, rot, off, flip) {
 function reload() {
 	if (pl.bullets >= pl.bulletsPerClip) return;
 	if (pl.clips <= 0) {
-		displayMessage("Out of ammo");
+		displayMinorMessage("Out of ammo");
 		return;
 	}
 	pl.bullets = pl.bulletsPerClip;
