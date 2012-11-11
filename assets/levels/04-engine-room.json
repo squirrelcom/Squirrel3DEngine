@@ -1,5 +1,6 @@
 {
 	"title": "The Engine Room",
+	"next": "[credits]",
 	"roomHeight": 3,
 	"gridSize": 2,
 	"width": 40,

@@ -124,6 +124,10 @@ function init() {
 }
 
 function resetLevel(levelName) {
+	if (levelName == "[credits]") {
+		window.location = "credits.html";
+		return;
+	}
 	// TODO: Reloadless reset?
 	if (dungeon) {
 		if (levelName) window.location.hash = "#level=" + levelName;

@@ -32,6 +32,8 @@ This is based on several JS libraries/engines, most prominently:
 	* Physics engine
 * Fireworks.js - http://jeromeetienne.github.com/fireworks.js/
 	* Particle engine
+* PathFinding.js - https://github.com/qiao/PathFinding.js
+	* Path finding library
 * dat.GUI - http://code.google.com/p/dat-gui/
 	* Settings and editor GUI
 

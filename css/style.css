@@ -3,7 +3,7 @@ body {
 	font-family: 'Black Ops One', serif;
 	font-size: 13px;
 	text-align:center;
-	background-color: #ffffff;
+	background-color: #000;
 	margin: 0px;
 	overflow: hidden;
 }
@@ -106,4 +106,9 @@ canvas {
 	margin: auto;
 	color: #c00;
 	font-size: 32px;
+}
+
+#credits ul {
+	list-style-type: none;
+	padding: 0;
 }
