@@ -29,10 +29,10 @@ var assets = {
 		"robot-death": [ "robot-death.wav" ]
 	},
 	materials: {
-		"metal-01": {},
+		"metal-01": { repeat: 2 },
 		"metal-02": {},
 		"metal-03": {},
-		"metal-bumps-01": {},
+		"metal-bumps-01": { repeat: 2 },
 		"metal-bumps-02": {},
 		"metal-bumps-03": {},
 		"metal-colored-01": {},

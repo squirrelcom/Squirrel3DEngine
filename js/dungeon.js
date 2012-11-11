@@ -160,13 +160,11 @@ function Dungeon(scene, player, levelName) {
 	this.generateMesh = function(level) {
 		var sqrt2 = Math.sqrt(2);
 		var block_mat = cache.getMaterial(level.materials.wall);
-		var block_params = {};
-		if (assets.materials[level.materials.wall] && assets.materials[level.materials.wall].roughness)
-			block_params.roughness = assets.materials[level.materials.wall].roughness;
+		var block_params = assets.materials[level.materials.wall] || {};
 
 		// Level geometry
 		var geometry = new THREE.Geometry(), mesh;
-		var cell, px, nx, pz, nz, py, ny, tess, cube, hash, rot;
+		var cell, px, nx, pz, nz, py, ny, tess, cube, hash, rot, repeat;
 		for (var j = 0; j < level.depth; ++j) {
 			for (var i = 0; i < level.width; ++i) {
 				px = nx = pz = nz = py = ny = 0;
@@ -181,10 +179,11 @@ function Dungeon(scene, player, levelName) {
 					hash = px + nx + pz + nz;
 					if (hash === 0) continue;
 					tess = block_params.roughness ? 10 : 0;
+					repeat = block_params.repeat || 1;
 					rot = 0;
 					if (cell === DIAG && (hash == 5 || hash == 6 || hash == 9 || hash == 10)) {
 						cube = new PlaneGeometry(level.gridSize * sqrt2, level.roomHeight, tess, tess,
-							"px", level.gridSize * sqrt2 / 2, level.roomHeight / 2, block_params.roughness);
+							"px", level.gridSize * sqrt2 / 2 * repeat, level.roomHeight / 2 * repeat, block_params.roughness);
 						if (hash == 5) rot = -45 / 180 * Math.PI;
 						else if (hash == 6) rot = -135 / 180 * Math.PI;
 						else if (hash == 9) rot = 45 / 180 * Math.PI;
@@ -194,7 +193,7 @@ function Dungeon(scene, player, levelName) {
 						cube = new BlockGeometry(level.gridSize, level.roomHeight, level.gridSize,
 							tess, tess, tess, block_mat,
 							{ px: px, nx: nx, py: 0, ny: 0, pz: pz, nz: nz },
-							level.gridSize/2, level.roomHeight/2, block_params.roughness);
+							level.gridSize/2 * repeat, level.roomHeight/2 * repeat, block_params.roughness);
 					}
 					mesh = new THREE.Mesh(cube);
 					mesh.position.x = (i + 0.5) * level.gridSize;
@@ -231,9 +230,10 @@ function Dungeon(scene, player, levelName) {
 		}
 
 		// Ceiling
+		repeat = assets.materials[level.materials.ceiling] ? assets.materials[level.materials.ceiling].repeat || 1 : 1;
 		var ceiling_plane = new Physijs.PlaneMesh(
 			new PlaneGeometry(level.gridSize * level.width, level.gridSize * level.depth,
-				1, 1, "ny", level.width, level.depth),
+				1, 1, "ny", level.width * repeat, level.depth * repeat),
 			Physijs.createMaterial(cache.getMaterial(level.materials.ceiling), 0.9, 0.0), // friction, restitution
 			0 // mass
 		);
@@ -243,9 +243,10 @@ function Dungeon(scene, player, levelName) {
 		scene.add(ceiling_plane);
 
 		// Floor
+		repeat = assets.materials[level.materials.floor] ? assets.materials[level.materials.floor].repeat || 1 : 1;
 		var floor_plane = new Physijs.PlaneMesh(
 			new PlaneGeometry(level.gridSize * level.width, level.gridSize * level.depth,
-				1, 1, "py", level.width, level.depth),
+				1, 1, "py", level.width * repeat, level.depth * repeat),
 			Physijs.createMaterial(cache.getMaterial(level.materials.floor), 0.9, 0.0), // friction, restitution
 			0 // mass
 		);
