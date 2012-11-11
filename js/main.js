@@ -308,7 +308,7 @@ $(document).ready(function() {
 			composer.render(dt);
 		} else {
 			renderer.render(scene, pl.camera);
-			if (CONFIG.showStats) rendererInfo.innerHTML = formatRenderInfo();
+			if (CONFIG.showStats) rendererInfo.innerHTML = formatRenderInfo(renderer.info);
 		}
 
 		if (CONFIG.showStats) renderStats.update();
