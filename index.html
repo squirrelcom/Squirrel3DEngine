@@ -1,14 +1,59 @@
 <!DOCTYPE html>
-<html class="no-js">
+<html lang="en">
 <head>
 	<meta charset="utf-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 	<title>Plasma Forks</title>
-	<meta name="description" content="">
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="WebGL game prototype">
+	<meta name="author" content="Tapio Vierros">
 
-	<link rel="stylesheet" href="css/normalize.min.css">
-	<link rel="stylesheet" href="css/h5bp.css">
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+	<style type="text/css">
+		body {
+			padding-top: 20px;
+			padding-bottom: 40px;
+			color: #aaa;
+			background-color: #111;
+		}
+
+		/* Custom container */
+		.container-narrow {
+			margin: 0 auto;
+			max-width: 700px;
+		}
+			.container-narrow > hr {
+			margin: 30px 0;
+		}
+
+		/* Main marketing message and sign up button */
+		.jumbotron {
+			margin: 60px 0;
+			text-align: center;
+		}
+		.jumbotron h1 {
+			font-size: 72px;
+			line-height: 1;
+		}
+		.jumbotron .btn {
+			font-size: 21px;
+			padding: 14px 24px;
+		}
+
+		/* Supporting marketing content */
+		.marketing {
+			margin: 60px 0;
+		}
+		.marketing p + h4 {
+			margin-top: 28px;
+		}
+		#webgl-error { display: none; }
+	</style>
+	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+
+	<!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+		<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
 
 	<script>
 		var _gaq = _gaq || [];
@@ -21,69 +66,158 @@
 		})();
 	</script>
 </head>
+
 <body>
 
-	<div class="header-container">
-		<header class="wrapper clearfix">
-			<h1 class="title">Plasma Forks</h1>
-			<nav>
+	<div class="container-narrow">
+
+		<div class="masthead">
+			<ul class="nav nav-pills pull-right">
+				<li><a href="#about">About</a></li>
+				<li><a href="game.html">Play</a></li>
+				<li><a href="editor/">Editor</a></li>
+				<li><a href="https://github.com/tapio/plasma-forks">GitHub</a></li>
+			</ul>
+		<h3 class="muted">Plasma Forks</h3>
+		</div>
+
+		<hr>
+
+		<div class="jumbotron">
+			<h1>3D Sci-fi FPS for the Modern Web!</h1>
+			<p class="lead">Battle against killer robots with your powerful fork gun in this open source 3d first-person shooter.</p>
+			<img class="shot" src="assets/shot.jpg" alt="Screenshot" title="Screenshot" width="300" height="250"></img><br/><br/>
+			<a class="btn btn-large btn-success" href="game.html">Try Alpha!</a>
+			<p/>
+			<div class="alert">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				This is an alpha version, so expect bugs and incompleteness.
+			</div>
+			<div id="webgl-error" class="alert alert-error">
+				Oh no! Your browser or GPU doesn't seem to support <a href="http://get.webgl.org/">WebGL</a>.
+				Unfortunately you can't play the game without it.
+			</div>
+		</div>
+
+		<hr id="about">
+
+		<div class="row-fluid marketing">
+			<div class="span6">
+				<h4>System Requirements</h4>
+				<p><ul>
+					<li>Latest version of Chrome (best performance and features) or Firefox
+						<ul>
+							<li>IE does not support WebGL and Opera has issues</li>
+						</ul>
+					</li>
+					<li>Good dedicated GPU and drivers (both must not be blacklisted for WebGL by the browser vendors)</li>
+					<li>Decent CPU and lots of RAM so that JavaScript runs well</li>
+				</ul></p>
+
+				<h4>Features</h4>
+				<p><ul>
+					<li>Action packed single-player campaign</li>
+					<li>Editor for creating and sharing more levels</li>
+					<li>High quality textures, models etc</li>
+					<li>Rigid body dynamics, i.e. physics</li>
+					<li>Dynamic lighting with shadows</li>
+					<li>Post-processing effects</li>
+					<li>Spatial audio</li>
+				</ul></p>
+
+				<h4>GitHub Game Off 2012</h4>
+				<p>This game was made for GitHub's <a href="https://github.com/blog/1303-github-game-off">Game Off 2012</a> challenge.
+				As existing engines were allowed, I took <a href="http://tapio.github.com/darkcorners/">Dark Corners</a>,
+				completely replaced the medieval-themed assets with a sci-fi setting, implemented stuff needed for a shooter,
+				such as sounds, weapons, "power-ups", smarter enemies etc. and came up with this new game, complete with a campaign.</p>
+			</div>
+
+			<div class="span6">
+				<h4>Editor</h4>
+				<p>There is also a level editor for creating and editing levels for the game.
+				For maximum productivity and minimal learning curve, the editor is 2D, but
+				you can test your creation very easily with a push of a button.</p>
+				<p>Levels can be exported and then shared with friends.</p>
+				<p><a class="btn btn-inverse" href="editor/">Launch editor &raquo;</a></p>
+
+				<h4>Open Source</h4>
+				<p>This game is open source under the very permissive MIT license, so you can freely study and modify it.
+				Assets have different but still free licenses. Everything is available at GitHub.</p>
+				<p><a class="btn btn-inverse" href="https://github.com/tapio/plasma-forks/">Project page @ GitHub &raquo;</a></p>
+			</div>
+		</div>
+
+		<hr>
+
+<!--
+		<div class="hero-unit">
+			<div class="row">
+				<div class="span6">
+					<h1>Plasma Forks</h1>
+					<p>This is a 3D first-person shooter game with a sci-fi theme.
+					Armed with a powerful Forkgun you take on an army of killer robots.
+					It runs in the web browser thanks to WebGL.</p>
+					<p>
+						<a class="btn btn-inverse btn-large" href="game.html">Play!</a>
+					</p>
+					<div id="webgl-error" class="alert alert-error">
+						Oh no! Your browser or GPU doesn't seem to support <a href="http://get.webgl.org/">WebGL</a>.
+						Unfortunately you can't play the game without it.
+					</div>
+				</div>
+				<div class="span4">
+					<img class="shot" src="assets/shot.jpg" alt="Screenshot" title="Screenshot" width="300" height="250"></img>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="span4">
+				<h2>Requirements</h2>
 				<ul>
-					<li><a href="game.html">Play</a></li>
-					<li><a href="editor/">Editor</a></li>
-					<li><a href="https://github.com/tapio">Source</a></li>
+					<li>Latest version of Chrome (best performance and features) or Firefox
+						<ul>
+							<li>IE does not support WebGL and Opera has issues</li>
+						</ul>
+					</li>
+					<li>Good dedicated GPU and drivers (both must not be blacklisted for WebGL by the browser vendors)</li>
+					<li>Decent CPU so that JavaScript runs well</li>
 				</ul>
-			</nav>
-		</header>
-	</div>
+				<p><a class="btn btn-inverse" href="https://github.com/tapio/plasma-forks/issues">Not running? Create an issue &raquo;</a></p>
+			</div>
+			<div class="span4">
+				<h2>Editor</h2>
+				<p>There is also a level editor for creating and editing levels for the game.
+				For maximum productivity and minimal learning curve, the editor is 2D, but
+				you can test your creation very easily with a push of a button.</p>
+				<p>Levels can be exported and then shared with friends.</p>
+				<p><a class="btn btn-inverse" href="editor/">Launch editor &raquo;</a></p>
+			</div>
+			<div class="span4">
+				<h2>Open source</h2>
+				<p>This game is open source under the very permissive MIT license, so you can freely study and modify it.
+				Assets have different but still free licenses. Everything is available at GitHub.</p>
+				<p><a class="btn btn-inverse" href="https://github.com/tapio/plasma-forks/">Project page @ GitHub &raquo;</a></p>
+			</div>
+		</div>
 
-	<div class="main-container">
-		<div class="main wrapper clearfix">
-
-			<article>
-				<header>
-					<h1>Open Source FPS for the Web</h1>
-					<p>Plasma Forks is a 3D first-person shooter with a sci-fi theme.
-					Armed with a powerful Forkgun you take on an army of killer robots.</p>
-				</header>
-				<section>
-					<h2>System Requirements</h2>
-					<ul>
-						<li>Latest Chrome (better) or Firefox</li>
-						<li>A good GPU</li>
-						<li>Decent CPU and enough RAM to handle JavaScript</li>
-					</ul>
-				</section>
-				<section>
-					<h2>Features</h2>
-					<ul>
-						<li>Action packed single-player campaign</li>
-						<li>Editor for creating and sharing more levels</li>
-						<li>High quality textures, models etc</li>
-						<li>Rigid body dynamics, i.e. physics</li>
-						<li>Dynamic lighting with shadows</li>
-						<li>Post-processing effects</li>
-						<li>Spatial audio</li>
-					</ul>
-				</section>
-				<footer>
-					<h3>Open Source</h3>
-					<p>This game is open source under the very permissive MIT license. Assets have different but still free licenses.</p>
-				</footer>
-			</article>
-
-			<aside>
-				<h3>Screenshot</h3>
-				<img class="shot" src="assets/shot.jpg" alt="Screenshot" title="Screenshot" width="300" height="250"></img>
-			</aside>
-
-		</div> <!-- #main -->
-	</div> <!-- #main-container -->
-
-	<div class="footer-container">
-		<footer class="wrapper">
-			<p>&copy; Tapio Vierros 2012</p>
+		<hr>
+-->
+		<footer>
+			<p class="muted"><small>&copy; Tapio Vierros 2012</small></p>
 		</footer>
+
 	</div>
+
+	<script src="libs/jquery-1.8.1.min.js"></script>
+	<script src="libs/bootstrap.min.js"></script>
+	<script>
+		var hasWebGL;
+		try {
+			hasWebGL = !!window.WebGLRenderingContext && !!document.createElement('canvas').getContext('experimental-webgl');
+		} catch( e ) { hasWebGL = false; }
+		if (!hasWebGL) $("#webgl-error").show();
+	</script>
 
 </body>
 </html>
