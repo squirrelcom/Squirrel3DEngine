@@ -11,6 +11,8 @@ var assets = {
 	items: {
 		"ammo-box": { name: "ammo", collision: "box", mass: 250, sound: "metal", item: { type: "clips", amount: 2 } },
 		"health-box": { name: "health pack", collision: "box", mass: 250, sound: "metal", item: { type: "hp", amount: 25 } },
+		"heated-forks-box": { name: "heated forks ammo upgrade", collision: "box", mass: 150, item: { type: "heated-forks" } },
+		"plasma-forks-box": { name: "plasma forks ammo upgrade", collision: "box", mass: 150, item: { type: "plasma-forks" } }
 	},
 	monsters: {
 		"robot": {
