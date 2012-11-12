@@ -96,18 +96,22 @@
 		else if (localStorage.getItem("editor-autosave"))
 			tools["Import level"](localStorage.getItem("editor-autosave"));
 
+		function createGallery(parent, arr, id_templ, path_templ) {
+			var template = '<td><img id="' + id_templ + '" src="' + path_templ + '" width="64" height="64" alt="%1" title="%1"></img></td>';
+			var cols = 10;
+			var gallery = "";
+			for (i = 0; i < arr.length; ++i) {
+				if (i % cols === 0) gallery += '<tr>';
+				gallery += template.replace(/%1/g, arr[i]);
+				if (i % cols == cols-1) gallery += '</tr>';
+			}
+			document.getElementById(parent).innerHTML = gallery;
+		}
+
 		// Material gallery
 		var materials = [];
 		for (i in assets.materials) materials.push(i);
-		var mtemplate = '<td><img id="tex-%1" src="../assets/textures/thumbs/%1.jpg" width="64" height="64" alt="%1" title="%1"></img></td>';
-		var mcols = 10;
-		var mgallery = "";
-		for (i = 0; i < materials.length; ++i) {
-			if (i % mcols === 0) mgallery += '<tr>';
-			mgallery += mtemplate.replace(/%1/g, materials[i]);
-			if (i % mcols == mcols-1) mgallery += '</tr>';
-		}
-		document.getElementById("matthumbs").innerHTML = mgallery;
+		createGallery("matthumbs", materials, "tex-%1", "../assets/textures/thumbs/%1.jpg");
 		var images = {};
 		for (i = 0; i < materials.length; ++i)
 			images[materials[i]] = document.getElementById("tex-" + materials[i]);
@@ -118,15 +122,7 @@
 		// Object gallery
 		for (i in assets.objects) tools.object.objects.push(i);
 		tools.object.object = tools.object.objects[0];
-		var otemplate = '<td><img id="obj-%1" src="../assets/models/%1/thumb.jpg" width="64" height="64" alt="%1" title="%1"></img></td>';
-		var ocols = 10;
-		var ogallery = "";
-		for (i = 0; i < tools.object.objects.length; ++i) {
-			if (i % ocols === 0) ogallery += '<tr>';
-			ogallery += otemplate.replace(/%1/g, tools.object.objects[i]);
-			if (i % ocols == ocols-1) ogallery += '</tr>';
-		}
-		document.getElementById("objthumbs").innerHTML = ogallery;
+		createGallery("objthumbs", tools.object.objects, "obj-%1", "../assets/models/%1/thumb.jpg");
 
 		// Items
 		for (i in assets.items) tools.item.items.push(i);
