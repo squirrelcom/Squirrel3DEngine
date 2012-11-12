@@ -30,12 +30,15 @@
 	<div id="tooltip"></div>
 	<p>Left click to draw walls or place selected thing. Right click to erase.</p>
 	<textarea id="exported"></textarea>
-	<p>Object reference: hover over the image to see the name.
+	<p><strong>Object reference:</strong> hover over the image to see the name.
 	Currently you <strong>cannot</strong> click them.</p>
-	<table id="objthumbs"></table>
-	<p>Material reference: hover over the image to see the name to put to the map properties.
+	<table id="obj-thumbs"></table>
+	<p><strong>Item reference:</strong> hover over the image to see the name.
+	Currently you <strong>cannot</strong> click them.</p>
+	<table id="item-thumbs"></table>
+	<p><strong>Material reference:</strong> hover over the image to see the name to put to the map properties.
 	Currently you <strong>cannot</strong> click them and the material cannot be set for individual tiles.</p>
-	<table id="matthumbs"></table>
+	<table id="mat-thumbs"></table>
 
 	<script>
 		window.requestAnimationFrame = window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame;
@@ -111,7 +114,7 @@
 		// Material gallery
 		var materials = [];
 		for (i in assets.materials) materials.push(i);
-		createGallery("matthumbs", materials, "tex-%1", "../assets/textures/thumbs/%1.jpg");
+		createGallery("mat-thumbs", materials, "tex-%1", "../assets/textures/thumbs/%1.jpg");
 		var images = {};
 		for (i = 0; i < materials.length; ++i)
 			images[materials[i]] = document.getElementById("tex-" + materials[i]);
@@ -122,11 +125,12 @@
 		// Object gallery
 		for (i in assets.objects) tools.object.objects.push(i);
 		tools.object.object = tools.object.objects[0];
-		createGallery("objthumbs", tools.object.objects, "obj-%1", "../assets/models/%1/thumb.jpg");
+		createGallery("obj-thumbs", tools.object.objects, "obj-%1", "../assets/models/%1/thumb.jpg");
 
 		// Items
 		for (i in assets.items) tools.item.items.push(i);
 		if (tools.item.items.length) tools.item.item = tools.item.items[0];
+		createGallery("item-thumbs", tools.item.items, "obj-%1", "../assets/items/%1/thumb.jpg");
 
 		// Monsters
 		for (i in assets.monsters) tools.monster.monsters.push(i);
