@@ -29,12 +29,14 @@ function Sound(samples, minPlayers) {
 
 	this.play = function(volume) {
 		if (!CONFIG.sounds) return;
-		var sample = this.samples[this.sampleIndex];
-		if (window.chrome) sample.load(); // Chrome requires reload
-		else sample.currentTime = 0;
-		if (volume !== undefined)
-			sample.volume = volume;
-		sample.play();
-		this.sampleIndex = (this.sampleIndex + 1) % this.samples.length;
+		try { // Firefox fails at GitHub MIME types
+			var sample = this.samples[this.sampleIndex];
+			if (window.chrome) sample.load(); // Chrome requires reload
+			else sample.currentTime = 0;
+			if (volume !== undefined)
+				sample.volume = volume;
+			sample.play();
+			this.sampleIndex = (this.sampleIndex + 1) % this.samples.length;
+		} catch(e) {};
 	};
 }

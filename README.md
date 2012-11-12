@@ -8,8 +8,8 @@ System Requirements
 -------------------
 
 * Latest version of Chrome or Firefox
-	* Chrome offers noticeable better performance
-	* IE does not support WebGL and Opera has issues
+	* Chrome offers noticeable better performance and more features
+	* IE does not support WebGL and Opera is broken
 * Good dedicated GPU and drivers (both must not be blacklisted for WebGL by the browser vendors)
 * Decent CPU so that JavaScript runs well
 
