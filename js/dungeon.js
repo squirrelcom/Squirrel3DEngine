@@ -115,10 +115,11 @@ function Dungeon(scene, player, levelName) {
 					if (this.hp <= 0) {
 						soundManager.playSpatial("robot-death", 20);
 						this.dead = true;
-						this.mesh.animate = false;
+						if (this.mesh) this.mesh.animate = false;
 						this.setAngularFactor({ x: 1, y: 1, z: 1 });
 						this.mass = 2000;
-						this.mesh.material = dead_material;
+						if (this.mesh) this.mesh.material = dead_material;
+						else this.material = dead_material;
 					} else {
 						// Hit effect
 						// TODO: Can't do this because the material is shared

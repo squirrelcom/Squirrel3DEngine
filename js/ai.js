@@ -8,14 +8,15 @@ function AIManager() {
 		v.copy(pos);
 		v.subSelf(monster.position);
 		v.y = 0;
-		monster.mesh.lookAt(v.normalize());
+		if (monster.mesh) monster.mesh.lookAt(v.normalize());
+		else monster.lookAt(v.normalize());
 		if (monster.position.distanceToSquared(pos) >= sq_thres) {
 			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
-			monster.mesh.animate = true;
+			if (monster.mesh) monster.mesh.animate = true;
 			return false;
 		} else {
 			monster.setLinearVelocity(v.set(0, 0, 0));
-			monster.mesh.animate = false;
+			if (monster.mesh) monster.mesh.animate = false;
 			return true;
 		}
 	}
@@ -45,7 +46,7 @@ function AIManager() {
 				walkTowards(monster, pl.position, 12, dt);
 				// Shoot?
 				if (Math.random() < 0.05) {
-					shoot(monster.position, monster.mesh.rotation, v.set(0, 0.11, -1.2), true);
+					shoot(monster.position, monster.mesh ? monster.mesh.rotation : monster.rotation, v.set(0, 0.11, -1.2), true);
 				}
 
 			// Target lost? Let's find a path
