@@ -27,11 +27,11 @@ var assets = {
 	},
 	sounds: {
 		"shoot": [ "fork-launch.ogg" ],
-		"shoot-dry": [ "empty-gun.wav" ],
-		"reload": [ "reload.wav" ],
-		"pick-up": [ "pick-up.wav" ],
-		"metal": [ "metal-1.wav", "metal-2.wav", "metal-3.wav" ],
-		"robot-death": [ "robot-death.wav" ]
+		"shoot-dry": [ "empty-gun.ogg" ],
+		"reload": [ "reload.ogg" ],
+		"pick-up": [ "pick-up.ogg" ],
+		"metal": [ "metal-1.ogg", "metal-2.ogg", "metal-3.ogg" ],
+		"robot-death": [ "robot-death.ogg" ]
 	},
 	materials: {
 		"metal-01": { repeat: 2 },
