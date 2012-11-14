@@ -364,8 +364,8 @@ function Dungeon(scene, player, levelName) {
 			light2.angle = Math.PI / 2;
 			light2.castShadow = true;
 			light2.onlyShadow = true;
-			light2.shadowCameraNear = 0.1 * UNIT;
-			light2.shadowCameraFar = light.distance * 1.5 * UNIT;
+			light2.shadowCameraNear = 0.1;
+			light2.shadowCameraFar = light.distance * 1.5;
 			light2.shadowCameraFov = 100;
 			light2.shadowBias = -0.0002;
 			light2.shadowDarkness = 0.3;
@@ -393,8 +393,8 @@ function Dungeon(scene, player, levelName) {
 		player.shadow.angle = Math.PI / 8;
 		//player.shadow.onlyShadow = true;
 		player.shadow.castShadow = true;
-		player.shadow.shadowCameraNear = 0.1 * UNIT;
-		player.shadow.shadowCameraFar = 10 * UNIT;
+		player.shadow.shadowCameraNear = 0.1;
+		player.shadow.shadowCameraFar = 10;
 		player.shadow.shadowCameraFov = 90;
 		player.shadow.shadowBias = -0.0002;
 		player.shadow.shadowDarkness = 0.3;

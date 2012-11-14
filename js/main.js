@@ -9,14 +9,14 @@ var passes = {};
 
 function init() {
 	scene = new Physijs.Scene();
-	scene.setGravity(new THREE.Vector3(0, -10 * UNIT, 0));
+	scene.setGravity(new THREE.Vector3(0, -10, 0));
 	scene.fog = new THREE.FogExp2(0x000000, 0.05);
 	scene.addEventListener('update', function() {
 		if (CONFIG.showStats) physicsStats.update();
 	});
 
 	pl = new Physijs.CapsuleMesh(
-		new THREE.CylinderGeometry(0.8 * UNIT, 0.8 * UNIT, 2 * UNIT),
+		new THREE.CylinderGeometry(0.8, 0.8, 2.0),
 		new THREE.MeshBasicMaterial({ color: 0xff00ff }),
 		100
 	);
@@ -53,10 +53,10 @@ function init() {
 	pl.clips = 5;
 	updateHUD();
 
-	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1 * UNIT, 30 * UNIT);
+	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 30);
 
 	controls = new Controls(pl.camera, { mouse: mouseHandler });
-	controls.movementSpeed = 10 * UNIT;
+	controls.movementSpeed = 10;
 	controls.lookSpeed = 0.5;
 	controls.lookVertical = true;
 	controls.constrainVerticalLook = true;
@@ -292,7 +292,7 @@ $(document).ready(function() {
 		// Subtract them to get the velocity
 		v1.subSelf(v0);
 		// Convert the velocity unit to per second
-		v1.divideScalar(dt * UNIT);
+		v1.divideScalar(dt);
 		// We only use the planar velocity, so we preserve the old y-velocity
 		var vy = pl.getLinearVelocity().y;
 		// Set the velocity, but disallow jumping/flying, i.e. upwards velocity
