@@ -208,7 +208,6 @@ function animate(dt) {
 	function getAnim(time) { return Math.abs(time - (time|0) - 0.5) * 2.0; }
 	function fract(num) { return num - (num|0); }
 	var i, v = new THREE.Vector3();
-	dt = dt < 0.1 ? dt : 0.1;
 
 	// Update object animations
 	animationManager.update(dt);
@@ -283,6 +282,7 @@ $(document).ready(function() {
 
 		// Player movement, controls and physics
 		var dt = clock.getDelta();
+		if (dt > 0.05) dt = 0.05; // Limit delta to 20 FPS
 		// Take note of the position
 		v0.set(pl.camera.position.x, 0, pl.camera.position.z);
 		// Let controls update the position
