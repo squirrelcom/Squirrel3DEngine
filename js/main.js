@@ -53,7 +53,7 @@ function init() {
 	pl.clips = 5;
 	updateHUD();
 
-	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 30);
+	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 25);
 
 	controls = new Controls(pl.camera, { mouse: mouseHandler });
 	controls.movementSpeed = 10;
