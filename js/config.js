@@ -20,6 +20,7 @@ var hashParams = (function() {
 })();
 
 var CONFIG = {
+	fullscreen: false,
 	showStats: true,
 	quarterMode: false,
 	sounds: true,

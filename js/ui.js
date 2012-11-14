@@ -31,16 +31,18 @@ function initUI() {
 	$(window).focus(resume);
 	$("#instructions").click(function() {
 		// Firefox doesn't support fullscreenless pointer lock, so resort to this hack
-		if (/Firefox/i.test(navigator.userAgent)) {
+		if (CONFIG.fullscreen || /Firefox/i.test(navigator.userAgent)) {
 			var onFullscreenChange = function(event) {
-				if (document.fullscreenElement || document.mozFullscreenElement || document.mozFullScreenElement) {
+				if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.mozFullScreenElement) {
 					document.removeEventListener('fullscreenchange', onFullscreenChange);
 					document.removeEventListener('mozfullscreenchange', onFullscreenChange);
+					document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
 					container.requestPointerLock();
 				}
 			};
 			document.addEventListener('fullscreenchange', onFullscreenChange, false);
 			document.addEventListener('mozfullscreenchange', onFullscreenChange, false);
+			document.addEventListener('webkitfullscreenchange', onFullscreenChange, false);
 			container.requestFullscreen();
 		} else {
 			container.requestPointerLock();
@@ -54,8 +56,9 @@ function initUI() {
 
 	// GUI controls
 	var gui = new dat.GUI();
-	gui.add(CONFIG, "showStats").onChange(updateConfig);
+	gui.add(CONFIG, "fullscreen").onChange(updateConfig);
 	gui.add(CONFIG, "quarterMode").onChange(function() { updateConfig(); onWindowResize(); });
+	gui.add(CONFIG, "showStats").onChange(updateConfig);
 	gui.add(CONFIG, "sounds").onChange(updateConfig);
 	gui.add(controls, "mouseFallback");
 	gui.add(window, "editLevel");
