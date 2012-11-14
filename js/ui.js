@@ -3,8 +3,6 @@ var renderStats, physicsStats, rendererInfo;
 
 function initUI() {
 	var container = document.getElementById('container');
-
-	container.innerHTML = "";
 	container.appendChild(renderer.domElement);
 
 	renderStats = new Stats();
