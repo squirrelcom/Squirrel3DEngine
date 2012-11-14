@@ -1,5 +1,4 @@
 "use strict";
-var UNIT = 1;
 
 if (!Detector.webgl) {
 	Detector.addGetWebGLMessage();
@@ -20,6 +19,7 @@ var hashParams = (function() {
 })();
 
 var CONFIG = {
+	fullscreen: false,
 	showStats: true,
 	quarterMode: false,
 	sounds: true,
@@ -434,14 +434,15 @@ function AIManager() {
 		v.copy(pos);
 		v.subSelf(monster.position);
 		v.y = 0;
-		monster.mesh.lookAt(v.normalize());
+		if (monster.mesh) monster.mesh.lookAt(v.normalize());
+		else monster.lookAt(v.normalize());
 		if (monster.position.distanceToSquared(pos) >= sq_thres) {
 			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
-			monster.mesh.animate = true;
+			if (monster.mesh) monster.mesh.animate = true;
 			return false;
 		} else {
 			monster.setLinearVelocity(v.set(0, 0, 0));
-			monster.mesh.animate = false;
+			if (monster.mesh) monster.mesh.animate = false;
 			return true;
 		}
 	}
@@ -471,7 +472,7 @@ function AIManager() {
 				walkTowards(monster, pl.position, 12, dt);
 				// Shoot?
 				if (Math.random() < 0.05) {
-					shoot(monster.position, monster.mesh.rotation, v.set(0, 0.11, -1.2), true);
+					shoot(monster.position, monster.mesh ? monster.mesh.rotation : monster.rotation, v.set(0, 0.11, -1.2), true);
 				}
 
 			// Target lost? Let's find a path
@@ -1069,6 +1070,8 @@ var assets = {
 	items: {
 		"ammo-box": { name: "ammo", collision: "box", mass: 250, sound: "metal", item: { type: "clips", amount: 2 } },
 		"health-box": { name: "health pack", collision: "box", mass: 250, sound: "metal", item: { type: "hp", amount: 25 } },
+		"heated-forks-box": { name: "heated forks ammo upgrade", collision: "box", mass: 150, item: { type: "heated-forks" } },
+		"plasma-forks-box": { name: "plasma forks ammo upgrade", collision: "box", mass: 150, item: { type: "plasma-forks" } }
 	},
 	monsters: {
 		"robot": {
@@ -1082,12 +1085,12 @@ var assets = {
 		"ceiling-lamp": { type: "ceiling", offset: { x: 0, y: -0.2, z: 0 } }
 	},
 	sounds: {
-		"shoot": [ "fork-launch.wav" ],
-		"shoot-dry": [ "empty-gun.wav" ],
-		"reload": [ "reload.wav" ],
-		"pick-up": [ "pick-up.wav" ],
-		"metal": [ "metal-1.wav", "metal-2.wav", "metal-3.wav" ],
-		"robot-death": [ "robot-death.wav" ]
+		"shoot": [ "fork-launch.ogg" ],
+		"shoot-dry": [ "empty-gun.ogg" ],
+		"reload": [ "reload.ogg" ],
+		"pick-up": [ "pick-up.ogg" ],
+		"metal": [ "metal-1.ogg", "metal-2.ogg", "metal-3.ogg" ],
+		"robot-death": [ "robot-death.ogg" ]
 	},
 	materials: {
 		"metal-01": { repeat: 2 },
@@ -1525,10 +1528,11 @@ function Dungeon(scene, player, levelName) {
 					if (this.hp <= 0) {
 						soundManager.playSpatial("robot-death", 20);
 						this.dead = true;
-						this.mesh.animate = false;
+						if (this.mesh) this.mesh.animate = false;
 						this.setAngularFactor({ x: 1, y: 1, z: 1 });
 						this.mass = 2000;
-						this.mesh.material = dead_material;
+						if (this.mesh) this.mesh.material = dead_material;
+						else this.material = dead_material;
 					} else {
 						// Hit effect
 						// TODO: Can't do this because the material is shared
@@ -1773,8 +1777,8 @@ function Dungeon(scene, player, levelName) {
 			light2.angle = Math.PI / 2;
 			light2.castShadow = true;
 			light2.onlyShadow = true;
-			light2.shadowCameraNear = 0.1 * UNIT;
-			light2.shadowCameraFar = light.distance * 1.5 * UNIT;
+			light2.shadowCameraNear = 0.1;
+			light2.shadowCameraFar = light.distance * 1.5;
 			light2.shadowCameraFov = 100;
 			light2.shadowBias = -0.0002;
 			light2.shadowDarkness = 0.3;
@@ -1802,8 +1806,8 @@ function Dungeon(scene, player, levelName) {
 		player.shadow.angle = Math.PI / 8;
 		//player.shadow.onlyShadow = true;
 		player.shadow.castShadow = true;
-		player.shadow.shadowCameraNear = 0.1 * UNIT;
-		player.shadow.shadowCameraFar = 10 * UNIT;
+		player.shadow.shadowCameraNear = 0.1;
+		player.shadow.shadowCameraFar = 10;
 		player.shadow.shadowCameraFov = 90;
 		player.shadow.shadowBias = -0.0002;
 		player.shadow.shadowDarkness = 0.3;
@@ -1931,8 +1935,6 @@ var renderStats, physicsStats, rendererInfo;
 
 function initUI() {
 	var container = document.getElementById('container');
-
-	container.innerHTML = "";
 	container.appendChild(renderer.domElement);
 
 	renderStats = new Stats();
@@ -1959,16 +1961,18 @@ function initUI() {
 	$(window).focus(resume);
 	$("#instructions").click(function() {
 		// Firefox doesn't support fullscreenless pointer lock, so resort to this hack
-		if (/Firefox/i.test(navigator.userAgent)) {
+		if (CONFIG.fullscreen || /Firefox/i.test(navigator.userAgent)) {
 			var onFullscreenChange = function(event) {
-				if (document.fullscreenElement || document.mozFullscreenElement || document.mozFullScreenElement) {
+				if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.mozFullScreenElement) {
 					document.removeEventListener('fullscreenchange', onFullscreenChange);
 					document.removeEventListener('mozfullscreenchange', onFullscreenChange);
+					document.removeEventListener('webkitfullscreenchange', onFullscreenChange);
 					container.requestPointerLock();
 				}
 			};
 			document.addEventListener('fullscreenchange', onFullscreenChange, false);
 			document.addEventListener('mozfullscreenchange', onFullscreenChange, false);
+			document.addEventListener('webkitfullscreenchange', onFullscreenChange, false);
 			container.requestFullscreen();
 		} else {
 			container.requestPointerLock();
@@ -1982,8 +1986,9 @@ function initUI() {
 
 	// GUI controls
 	var gui = new dat.GUI();
-	gui.add(CONFIG, "showStats").onChange(updateConfig);
+	gui.add(CONFIG, "fullscreen").onChange(updateConfig);
 	gui.add(CONFIG, "quarterMode").onChange(function() { updateConfig(); onWindowResize(); });
+	gui.add(CONFIG, "showStats").onChange(updateConfig);
 	gui.add(CONFIG, "sounds").onChange(updateConfig);
 	gui.add(controls, "mouseFallback");
 	gui.add(window, "editLevel");
@@ -2089,14 +2094,14 @@ var passes = {};
 
 function init() {
 	scene = new Physijs.Scene();
-	scene.setGravity(new THREE.Vector3(0, -10 * UNIT, 0));
+	scene.setGravity(new THREE.Vector3(0, -10, 0));
 	scene.fog = new THREE.FogExp2(0x000000, 0.05);
 	scene.addEventListener('update', function() {
 		if (CONFIG.showStats) physicsStats.update();
 	});
 
 	pl = new Physijs.CapsuleMesh(
-		new THREE.CylinderGeometry(0.8 * UNIT, 0.8 * UNIT, 2 * UNIT),
+		new THREE.CylinderGeometry(0.8, 0.8, 2.0),
 		new THREE.MeshBasicMaterial({ color: 0xff00ff }),
 		100
 	);
@@ -2133,10 +2138,10 @@ function init() {
 	pl.clips = 5;
 	updateHUD();
 
-	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1 * UNIT, 30 * UNIT);
+	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 25);
 
 	controls = new Controls(pl.camera, { mouse: mouseHandler });
-	controls.movementSpeed = 10 * UNIT;
+	controls.movementSpeed = 10;
 	controls.lookSpeed = 0.5;
 	controls.lookVertical = true;
 	controls.constrainVerticalLook = true;
@@ -2288,7 +2293,6 @@ function animate(dt) {
 	function getAnim(time) { return Math.abs(time - (time|0) - 0.5) * 2.0; }
 	function fract(num) { return num - (num|0); }
 	var i, v = new THREE.Vector3();
-	dt = dt < 0.1 ? dt : 0.1;
 
 	// Update object animations
 	animationManager.update(dt);
@@ -2363,6 +2367,7 @@ $(document).ready(function() {
 
 		// Player movement, controls and physics
 		var dt = clock.getDelta();
+		if (dt > 0.05) dt = 0.05; // Limit delta to 20 FPS
 		// Take note of the position
 		v0.set(pl.camera.position.x, 0, pl.camera.position.z);
 		// Let controls update the position
@@ -2372,7 +2377,7 @@ $(document).ready(function() {
 		// Subtract them to get the velocity
 		v1.subSelf(v0);
 		// Convert the velocity unit to per second
-		v1.divideScalar(dt * UNIT);
+		v1.divideScalar(dt);
 		// We only use the planar velocity, so we preserve the old y-velocity
 		var vy = pl.getLinearVelocity().y;
 		// Set the velocity, but disallow jumping/flying, i.e. upwards velocity
