@@ -303,9 +303,11 @@ $(document).ready(function() {
 		// FIXME: 0.5 below is magic number to rise camera
 		controls.object.position.set(pl.position.x, pl.position.y + 0.5, pl.position.z);
 
-		aiManager.process(dt);
-		animate(dt);
-		lightManager.update(pl);
+		if (!pl.dead) {
+			aiManager.process(dt);
+			animate(dt);
+			lightManager.update(pl);
+		}
 		renderer.clear();
 		if (CONFIG.postprocessing) {
 			renderer.shadowMapEnabled = CONFIG.shadows;
