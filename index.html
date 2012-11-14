@@ -47,6 +47,8 @@
 			margin-top: 28px;
 		}
 		#webgl-error { display: none; }
+		#firefox-warning { display: none; }
+		#angle-warning { display: none; }
 	</style>
 	<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
 
@@ -89,13 +91,23 @@
 			<img class="shot" src="assets/shot.jpg" alt="Screenshot" title="Screenshot" width="300" height="250"></img><br/><br/>
 			<a class="btn btn-large btn-success" href="game.html">Try Alpha!</a>
 			<p/>
-			<div class="alert">
-				<button type="button" class="close" data-dismiss="alert">×</button>
-				This is an alpha version, so expect bugs and incompleteness.
-			</div>
 			<div id="webgl-error" class="alert alert-error">
 				Oh no! Your browser or GPU doesn't seem to support <a href="http://get.webgl.org/">WebGL</a>.
 				Unfortunately you can't play the game without it.
+			</div>
+			<div id="angle-warning" class="alert">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				You may be affected by ANGLE/browser bug.<br/>
+				Try disabling <em>shadows</em> in the options and reloading the game.
+			</div>
+			<div id="firefox-warning" class="alert">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				You seem to be using Firefox. It has bad performance and reduced features.<br/>
+				Try enabling <em>quarterMode</em> in the options or switch to Chrome.
+			</div>
+			<div class="alert">
+				<button type="button" class="close" data-dismiss="alert">×</button>
+				This is an alpha version, so expect bugs and incompleteness.
 			</div>
 		</div>
 
@@ -107,7 +119,7 @@
 				<p><ul>
 					<li>Latest version of Chrome
 						<ul>
-							<li>Currently on Windows, you might need to launch it with <strong>--use-gl=desktop</strong> flag due to ANGLE bugs</li>
+							<li>Currently on Windows, you might need to launch it with <strong>--use-gl=desktop</strong> flag or disable shadows due to ANGLE bugs</li>
 							<li>Firefox kind of works too, but has bad performance and some missing features</li>
 							<li>IE does not support WebGL and Opera is broken</li>
 						</ul>
@@ -160,11 +172,17 @@
 	<script src="libs/jquery-1.8.1.min.js"></script>
 	<script src="libs/bootstrap.min.js"></script>
 	<script>
+		// Warnings and errors
 		var hasWebGL;
 		try {
 			hasWebGL = !!window.WebGLRenderingContext && !!document.createElement('canvas').getContext('experimental-webgl');
 		} catch( e ) { hasWebGL = false; }
 		if (!hasWebGL) $("#webgl-error").show();
+		var isFirefox = /Firefox/i.test(navigator.userAgent);
+		var isChrome = /Chrome/i.test(navigator.userAgent);
+		var isWindows = /Win/i.test(navigator.platform);
+		if (isFirefox) $("#firefox-warning").show();
+		if (isWindows && (isFirefox || isChrome)) $("#angle-warning").show();
 	</script>
 
 </body>
