@@ -108,7 +108,36 @@ canvas {
 	font-size: 32px;
 }
 
+.full { height: 100%; }
+
+#positioner {
+	-webkit-animation-duration: 15s;
+	-moz-animation-duration: 15s;
+	 animation-duration: 15s;
+	-webkit-animation-name: creditsroll;
+	-moz-animation-name: creditsroll;
+	 animation-name: creditsroll;
+	-webkit-animation-timing-function: linear;
+	-moz-animation-timing-function: linear;
+	 animation-timing-function: linear;
+}
+
 #credits ul {
 	list-style-type: none;
 	padding: 0;
+}
+
+@-webkit-keyframes creditsroll {
+	from { height: 80%; }
+	to { height: 0%; }
+}
+
+@-moz-keyframes creditsroll {
+	from { height: 80%; }
+	to { height: 0%; }
+}
+
+@keyframes creditsroll {
+	from { height: 80%; }
+	to { height: 0%; }
 }
