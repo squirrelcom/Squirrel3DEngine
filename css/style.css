@@ -10,9 +10,9 @@ body {
 
 a { color: #a06851; }
 
-.hidden {
-	display: none;
-}
+.hidden { display: none; }
+
+#container { width: 100%; }
 
 canvas {
 	width: 100%;
