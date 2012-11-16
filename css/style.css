@@ -109,6 +109,7 @@ canvas {
 }
 
 .full { height: 100%; }
+.big { font-size: 48px; }
 
 #positioner {
 	-webkit-animation-duration: 15s;
@@ -125,6 +126,10 @@ canvas {
 #credits ul {
 	list-style-type: none;
 	padding: 0;
+}
+
+#credits a {
+	color: #226;
 }
 
 @-webkit-keyframes creditsroll {
