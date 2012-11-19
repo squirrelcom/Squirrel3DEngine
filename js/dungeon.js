@@ -259,7 +259,7 @@ function Dungeon(scene, player, levelName) {
 		scene.add(floor_plane);
 
 		// Level mesh
-		geometry.computeTangents();
+		//geometry.computeTangents();
 		mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
 		mesh.receiveShadow = true;
 		mesh.matrixAutoUpdate = false;
