@@ -1,6 +1,7 @@
 "use strict";
 function Cache() {
 	this.models = {};
+	this.modelMaterials = {};
 	this.geometries = {};
 	this.materials = {};
 	var self = this;
@@ -18,11 +19,12 @@ function Cache() {
 			this.models[path] = [ callback ];
 			loader.statusDomElement.style.display = "block";
 			modelsPending++;
-			loader.load(path, function(geometry) {
+			loader.load(path, function(geometry, materials) {
 				var mm = self.models[path];
 				for (var i = 0; i < mm.length; ++i)
-					mm[i](geometry);
+					mm[i](geometry, materials);
 				self.models[path] = geometry;
+				self.modelMaterials[path] = materials;
 				modelsPending--;
 				if (modelsPending == 0)
 					loader.statusDomElement.style.display = "none";
@@ -30,7 +32,7 @@ function Cache() {
 		} else if (m instanceof Array) { // Pending
 			m.push(callback);
 		} else // Already loaded
-			callback(m);
+			callback(m, this.modelMaterials[path]);
 	};
 
 	this.getGeometry = function(name, generator) {

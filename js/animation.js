@@ -3,25 +3,26 @@ function AnimationManager() {
 	this.anims = [];
 }
 
-AnimationManager.prototype.createAnimatedMesh = function(geometry, material, def) {
+AnimationManager.prototype.createAnimatedMesh = function(geometry, materials, def) {
 	var obj;
 	// Handle material animation stuff
-	for (var m = 0; m < geometry.materials.length; ++m) {
+	for (var m = 0; m < materials.length; ++m) {
 		if (def.animation.type === "morph") {
-			geometry.materials[m].morphTargets = true;
-			geometry.materials[m].morphNormals = true;
+			materials[m].morphTargets = true;
+			materials[m].morphNormals = true;
 		} else if (def.animation.type === "bones") {
-			geometry.materials[m].skinning = true;
+			materials[m].skinning = true;
 		}
 	}
 	// Create the mesh
+	var mat = materials.length > 1 ? new THREE.MeshFaceMaterial(materials) : materials[0];
 	if (def.animation.type === "morph") {
 		geometry.computeMorphNormals();
-		obj = new THREE.MorphAnimMesh(geometry, material);
+		obj = new THREE.MorphAnimMesh(geometry, mat);
 		obj.duration = def.animation.duration;
 		obj.time = obj.duration * Math.random();
 	} else if (def.animation.type === "bones") {
-		obj = new THREE.SkinnedMesh(geometry, material); // TODO: useVertexTexture?
+		obj = new THREE.SkinnedMesh(geometry, mat); // TODO: useVertexTexture?
 		THREE.AnimationHandler.add(geometry.animation);
 		obj.animation = new THREE.Animation(obj, "walk");
 	}

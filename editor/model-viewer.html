@@ -115,10 +115,10 @@
 				window.addEventListener('resize', onWindowResize, false);
 			}
 
-			function createScene(geometry) {
-				for (var m = 0; m < geometry.materials.length; ++m)
-					fixAnisotropy(geometry.materials[m], renderer.getMaxAnisotropy());
-				mesh = new THREE.Mesh(geometry, geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0]);
+			function createScene(geometry, materials) {
+				for (var m = 0; m < materials.length; ++m)
+					fixAnisotropy(materials[m], renderer.getMaxAnisotropy());
+				mesh = new THREE.Mesh(geometry, materials.length > 1 ? new THREE.MeshFaceMaterial(materials) : materials[0]);
 				mesh.castShadow = true;
 				mesh.receiveShadow = true;
 				scene.add(mesh);

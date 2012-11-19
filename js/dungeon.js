@@ -12,7 +12,7 @@ function Dungeon(scene, player, levelName) {
 	var dead_material = new THREE.MeshLambertMaterial({ color: 0x222222, ambient: 0x222222 });
 
 	function objectHandler(level, pos, ang, def) {
-		return function(geometry) {
+		return function(geometry, materials) {
 			if (!def) def = {};
 			var obj, mass = def.mass || 0;
 
@@ -26,10 +26,10 @@ function Dungeon(scene, player, levelName) {
 			if (!geometry.boundingBox) geometry.computeBoundingBox();
 
 			// Fix anisotropy
-			for (var m = 0; m < geometry.materials.length; ++m)
-				fixAnisotropy(geometry.materials[m]);
+			for (var m = 0; m < materials.length; ++m)
+				fixAnisotropy(materials[m]);
 
-			var mat = geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0];
+			var mat = materials.length > 1 ? new THREE.MeshFaceMaterial(materials) : materials[0];
 
 			// Mesh creation
 			if (def.collision) {
@@ -84,7 +84,7 @@ function Dungeon(scene, player, levelName) {
 			// Handle animated meshes
 			if (def.animation) {
 				obj.visible = false;
-				obj.mesh = animationManager.createAnimatedMesh(geometry, mat, def);
+				obj.mesh = animationManager.createAnimatedMesh(geometry, materials, def);
 				if (!def.noShadows) {
 					obj.mesh.castShadow = true;
 					obj.mesh.receiveShadow = true;
@@ -122,8 +122,8 @@ function Dungeon(scene, player, levelName) {
 						else this.material = dead_material;
 					} else {
 						// Hit effect
-						// TODO: Can't do this because the material is shared
-						//var mats = this.mesh.geometry.materials, m;
+						// TODO: Make this or similar work using the new non-shared materials
+						//var mats = this.mesh.materials, m;
 						//for (m = 0; m < mats.length; ++m) {
 						//	mats[m].color.r += 0.05;
 						//	mats[m].ambient.r += 0.05;
@@ -165,7 +165,7 @@ function Dungeon(scene, player, levelName) {
 		var block_params = assets.materials[level.materials.wall] || {};
 
 		// Level geometry
-		var geometry = new THREE.Geometry(), mesh;
+		var geometry = new THREE.Geometry(), mesh = new THREE.Mesh();
 		var cell, px, nx, pz, nz, py, ny, tess, cube, hash, rot, repeat;
 		for (var j = 0; j < level.depth; ++j) {
 			for (var i = 0; i < level.width; ++i) {
@@ -190,14 +190,13 @@ function Dungeon(scene, player, levelName) {
 						else if (hash == 6) rot = -135 / 180 * Math.PI;
 						else if (hash == 9) rot = 45 / 180 * Math.PI;
 						else if (hash == 10) rot = 135 / 180 * Math.PI;
-						cube.materials = [ block_mat ];
 					} else {
 						cube = new BlockGeometry(level.gridSize, level.roomHeight, level.gridSize,
-							tess, tess, tess, block_mat,
+							tess, tess, tess, false,
 							{ px: px, nx: nx, py: 0, ny: 0, pz: pz, nz: nz },
 							level.gridSize/2 * repeat, level.roomHeight/2 * repeat, block_params.roughness);
 					}
-					mesh = new THREE.Mesh(cube);
+					mesh.geometry = cube;
 					mesh.position.x = (i + 0.5) * level.gridSize;
 					mesh.position.y = 0.5 * level.roomHeight;
 					mesh.position.z = (j + 0.5) * level.gridSize;
@@ -231,6 +230,14 @@ function Dungeon(scene, player, levelName) {
 			}
 		}
 
+		// Level mesh
+		//geometry.computeTangents();
+		mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial([ block_mat ]));
+		mesh.receiveShadow = true;
+		mesh.matrixAutoUpdate = false;
+		mesh.updateMatrix();
+		scene.add(mesh);
+
 		// Ceiling
 		repeat = assets.materials[level.materials.ceiling] ? assets.materials[level.materials.ceiling].repeat || 1 : 1;
 		var ceiling_plane = new Physijs.PlaneMesh(
@@ -258,14 +265,6 @@ function Dungeon(scene, player, levelName) {
 		floor_plane.updateMatrix();
 		scene.add(floor_plane);
 
-		// Level mesh
-		//geometry.computeTangents();
-		mesh = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
-		mesh.receiveShadow = true;
-		mesh.matrixAutoUpdate = false;
-		mesh.updateMatrix();
-		scene.add(mesh);
-
 		// Exit
 		//cache.loadModel("assets/models/teleporter/teleporter.js",
 		//	objectHandler(level, new THREE.Vector3().set(level.exit[0], null, level.exit[1]), 0, assets.objects.teleporter));
@@ -277,10 +276,10 @@ function Dungeon(scene, player, levelName) {
 	this.addLights = function(level) {
 		// Torch model load callback
 		function torchHandler(pos, rot) {
-			return function(geometry) {
-				for (var m = 0; m < geometry.materials.length; ++m)
-					fixAnisotropy(geometry.materials[m]);
-				var mat = geometry.materials.length > 1 ? new THREE.MeshFaceMaterial() : geometry.materials[0];
+			return function(geometry, materials) {
+				for (var m = 0; m < materials.length; ++m)
+					fixAnisotropy(materials[m]);
+				var mat = materials.length > 1 ? new THREE.MeshFaceMaterial(materials) : materials[0];
 				var obj = new Physijs.CylinderMesh(geometry, mat, 0);
 				obj.position.copy(pos);
 				obj.rotation.y = rot;
@@ -465,18 +464,18 @@ function Dungeon(scene, player, levelName) {
 		pl.setAngularFactor({ x: 0, y: 0, z: 0 });
 
 		// Player gun
-		cache.loadModel("assets/items/gun/gun.js", function(geometry) {
-			player.rhand = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial());
+		cache.loadModel("assets/items/gun/gun.js", function(geometry, materials) {
+			player.rhand = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
 			player.rhand.position.copy(player.position);
 			scene.add(player.rhand);
 		});
 
 		// Bullets
-		cache.loadModel("assets/items/fork/fork.js", function(geometry) {
+		cache.loadModel("assets/items/fork/fork.js", function(geometry, materials) {
 			self.forks = [];
 			self.forkIndex = 0;
 			for (var i = 0; i < 20; ++i) {
-				var fork = new Physijs.BoxMesh(geometry, geometry.materials[0], 100);
+				var fork = new Physijs.BoxMesh(geometry, materials[0], 100);
 				fork.damage = 5;
 				self.forks.push(fork);
 				fork.visible = false;
