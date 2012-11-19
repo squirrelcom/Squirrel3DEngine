@@ -174,6 +174,8 @@ function reload() {
 		--pl.clips;
 		updateHUD();
 		reloading = false;
+		pl.rhand.material.materials[2] = pl.rhand.ammoGood;
+		pl.rhand.materialNeedsUpdate = true;
 	}, 2000);
 	soundManager.play("reload");
 }
@@ -187,6 +189,10 @@ function mouseHandler(button) {
 	} else if (button == 0 && pl.rhand && pl.bullets > 0 && !reloading) {
 		// Shoot!
 		--pl.bullets;
+		if (pl.bullets <= 0) {
+			pl.rhand.material.materials[2] = pl.rhand.ammoOut;
+			pl.rhand.materialNeedsUpdate = true;
+		}
 		shoot(pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
 		updateHUD();
 	} else if (button == 2) {

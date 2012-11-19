@@ -467,6 +467,9 @@ function Dungeon(scene, player, levelName) {
 		cache.loadModel("assets/items/gun/gun.js", function(geometry, materials) {
 			player.rhand = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
 			player.rhand.position.copy(player.position);
+			player.rhand.ammoGood = materials[2].clone();
+			player.rhand.ammoOut = materials[2].clone();
+			player.rhand.ammoOut.color.setRGB(0.3, 0.1, 0.1);
 			scene.add(player.rhand);
 		});
 
