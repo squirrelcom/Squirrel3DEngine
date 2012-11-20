@@ -489,7 +489,10 @@ function Dungeon(scene, player, levelName) {
 				fork.damage = self.forkTypes.plain.damage;
 				self.forks.push(fork);
 				fork.visible = false;
+				// Trick Physijs into thinking the fork is bigger -> greater change it appears on ground
+				fork.scale.set(3.0, 3.0, 1.0);
 				scene.add(fork);
+				fork.scale.set(1.0, 1.0, 1.0);
 			}
 		});
 
