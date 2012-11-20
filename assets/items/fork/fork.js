@@ -25,8 +25,6 @@
 		"colorSpecular" : [0.5, 0.5, 0.5],
 		"depthTest" : true,
 		"depthWrite" : true,
-		"mapDiffuse" : "diffuse.jpg",
-		"mapDiffuseWrap" : ["repeat", "repeat"],
 		"shading" : "Phong",
 		"specularCoef" : 50,
 		"transparency" : 1.0,
