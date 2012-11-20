@@ -99,7 +99,7 @@ function Dungeon(scene, player, levelName) {
 
 			if (def.item) {
 				obj.items = {};
-				obj.items[def.item.type] = def.item.amount || 1;
+				obj.items[def.item.type] = def.item.value || 1;
 				obj.itemName = def.name;
 			}
 
@@ -477,9 +477,16 @@ function Dungeon(scene, player, levelName) {
 		cache.loadModel("assets/items/fork/fork.js", function(geometry, materials) {
 			self.forks = [];
 			self.forkIndex = 0;
+			self.forkTypes = {
+				plain: { damage: 5, material: materials[0] },
+				heated: { damage: 8, material: materials[0].clone() },
+				plasma: { damage: 20, material: materials[0].clone() }
+			}
+			self.forkTypes.heated.material.ambient.setRGB(1.0, 0.3, 0.3);
+			self.forkTypes.plasma.material.ambient.setRGB(1.0, 0.3, 1.0);
 			for (var i = 0; i < 20; ++i) {
-				var fork = new Physijs.BoxMesh(geometry, materials[0], 100);
-				fork.damage = 5;
+				var fork = new Physijs.BoxMesh(geometry, self.forkTypes.plain.material, 100);
+				fork.damage = self.forkTypes.plain.damage;
 				self.forks.push(fork);
 				fork.visible = false;
 				scene.add(fork);

@@ -46,7 +46,7 @@ function AIManager() {
 				walkTowards(monster, pl.position, 12, dt);
 				// Shoot?
 				if (Math.random() < 0.05) {
-					shoot(monster.position, monster.mesh ? monster.mesh.rotation : monster.rotation, v.set(0, 0.11, -1.2), true);
+					shoot("plain", monster.position, monster.mesh ? monster.mesh.rotation : monster.rotation, v.set(0, 0.11, -1.2), true);
 				}
 
 			// Target lost? Let's find a path

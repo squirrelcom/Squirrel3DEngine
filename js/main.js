@@ -25,8 +25,10 @@ function init() {
 		if (this.dead) return;
 		if (other.items) {
 			for (var i in other.items) {
-				if (pl[i] !== undefined)
-					pl[i] += other.items[i];
+				if (pl[i] !== undefined) {
+					if (typeof(other.items[i]) === "number") pl[i] += other.items[i];
+					else pl[i] = other.items[i];
+				}
 			}
 			soundManager.play("pick-up");
 			displayMinorMessage("Picked up " + other.itemName);
@@ -51,6 +53,7 @@ function init() {
 	pl.bulletsPerClip = 15;
 	pl.bullets = pl.bulletsPerClip;
 	pl.clips = 5;
+	pl.ammoType = "plain";
 	updateHUD();
 
 	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 25);
@@ -141,10 +144,12 @@ function resetLevel(levelName) {
 }
 
 var shootVector = new THREE.Vector3();
-function shoot(pos, rot, off, flip) {
+function shoot(type, pos, rot, off, flip) {
 	soundManager.playSpatial("shoot", pos, 20);
 	var fork = dungeon.forks[dungeon.forkIndex];
 	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
+	fork.damage = dungeon.forkTypes[type].damage;
+	fork.material = dungeon.forkTypes[type].material;
 	fork.position.copy(pos);
 	fork.rotation.copy(rot);
 	if (flip) fork.rotation.y += Math.PI;
@@ -193,7 +198,7 @@ function mouseHandler(button) {
 			pl.rhand.material.materials[2] = pl.rhand.ammoOut;
 			pl.rhand.materialNeedsUpdate = true;
 		}
-		shoot(pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
+		shoot(pl.ammoType, pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
 		updateHUD();
 	} else if (button == 2) {
 		// Punch/push

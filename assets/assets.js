@@ -9,10 +9,10 @@ var assets = {
 		"turbine": { collision: "box", sound: "metal" }
 	},
 	items: {
-		"ammo-box": { name: "ammo", collision: "box", mass: 250, sound: "metal", item: { type: "clips", amount: 2 } },
-		"health-box": { name: "health pack", collision: "box", mass: 250, sound: "metal", item: { type: "hp", amount: 25 } },
-		"heated-forks-box": { name: "heated forks ammo upgrade", collision: "box", mass: 150, item: { type: "heated-forks" } },
-		"plasma-forks-box": { name: "plasma forks ammo upgrade", collision: "box", mass: 150, item: { type: "plasma-forks" } }
+		"ammo-box": { name: "ammo", collision: "box", mass: 250, sound: "metal", item: { type: "clips", value: 2 } },
+		"health-box": { name: "health pack", collision: "box", mass: 250, sound: "metal", item: { type: "hp", value: 25 } },
+		"heated-forks-box": { name: "heated forks ammo upgrade", collision: "box", mass: 150, item: { type: "ammoType", value: "heated" } },
+		"plasma-forks-box": { name: "plasma forks ammo upgrade", collision: "box", mass: 150, item: { type: "ammoType", value: "plasma" } }
 	},
 	monsters: {
 		"robot": {
