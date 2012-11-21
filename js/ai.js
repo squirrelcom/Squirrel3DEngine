@@ -38,7 +38,7 @@ function AIManager() {
 				// Look at player
 				walkTowards(monster, pl.position, 12);
 				// Shoot?
-				if (Math.random() < 0.5) {
+				if (Math.random() < 0.333) {
 					shoot("plain", monster.position, monster.mesh ? monster.mesh.rotation : monster.rotation, v.set(0, 0.11, -1.2), true);
 				}
 
