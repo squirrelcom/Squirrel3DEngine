@@ -239,16 +239,6 @@ function animate(dt) {
 	pl.light.position.set(pl.position.x, pl.position.y + 0.2, pl.position.z);
 	pl.shadow.position.copy(pl.light.position);
 	pl.shadow.target.position.copy(controls.target);
-
-	// Player weapon
-	if (pl.rhand) {
-		pl.rhand.position.set(pl.position.x, pl.position.y, pl.position.z);
-		pl.rhand.rotation.copy(pl.camera.rotation);
-		//pl.rhand.updateMatrix();
-		pl.rhand.translateX(0.4);
-		pl.rhand.translateY(0.2);
-		pl.rhand.translateZ(-1.0);
-	}
 }
 
 $(document).ready(function() {
@@ -294,6 +284,8 @@ $(document).ready(function() {
 		// Put the camera/controls back to the real, simulated position
 		// FIXME: 0.5 below is magic number to rise camera
 		controls.object.position.set(pl.position.x, pl.position.y + 0.5, pl.position.z);
+		pl.rotation.copy(pl.camera.rotation);
+		pl.__dirtyRotation = true;
 
 		if (!pl.dead) animate(dt);
 

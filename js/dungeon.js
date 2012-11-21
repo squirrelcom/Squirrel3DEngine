@@ -460,19 +460,21 @@ function Dungeon(scene, player, levelName) {
 		player.position.z = level.start[1] * level.gridSize;
 		if (level.startAngle)
 			controls.setYAngle(level.startAngle);
-		scene.add(pl);
-		pl.setAngularFactor({ x: 0, y: 0, z: 0 });
 
 		// Player gun
 		cache.loadModel("assets/items/gun/gun.js", function(geometry, materials) {
-			player.rhand = new THREE.Mesh(geometry, new THREE.MeshFaceMaterial(materials));
-			player.rhand.position.copy(player.position);
+			player.rhand = new Physijs.BoxMesh(geometry, new THREE.MeshFaceMaterial(materials));
+			// Hack: Materials for gun screen in order to show ammo is out differently
 			player.rhand.ammoGood = materials[2].clone();
 			player.rhand.ammoOut = materials[2].clone();
 			player.rhand.ammoOut.color.setRGB(0.3, 0.1, 0.1);
 			player.rhand.castShadow = true;
 			player.rhand.receiveShadow = true;
-			scene.add(player.rhand);
+			// FIXME: Should load this relative position from assets.js
+			player.rhand.position.set(0.4, 0.2, -1.0);
+			player.add(player.rhand);
+			scene.add(player); // Here player is added to the scene
+			player.setAngularFactor({ x: 0, y: 0, z: 0 });
 		});
 
 		// Bullets
