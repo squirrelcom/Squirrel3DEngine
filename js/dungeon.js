@@ -445,8 +445,8 @@ function Dungeon(scene, player, levelName) {
 
 	this.isAtExit = function(pos) {
 		return this.level &&
-			Math.abs(pos.x - this.level.exit[0] * this.level.gridSize) < 0.5 &&
-			Math.abs(pos.z - this.level.exit[1] * this.level.gridSize) < 0.5;
+			Math.abs(pos.x - this.level.exit[0] * this.level.gridSize) < 0.5 * this.level.gridSize &&
+			Math.abs(pos.z - this.level.exit[1] * this.level.gridSize) < 0.5 * this.level.gridSize;
 	};
 
 	function processLevel(level) {

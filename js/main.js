@@ -330,7 +330,7 @@ $(document).ready(function() {
 		// Exit?
 		if (dungeon.isAtExit(pl.position))
 			resetLevel(dungeon.level.next);
-	}, 100);
+	}, 45);
 
 	render();
 });
