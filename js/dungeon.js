@@ -489,7 +489,7 @@ function Dungeon(scene, player, levelName) {
 			}
 			self.forkTypes.heated.material.ambient.setRGB(1.0, 0.3, 0.3);
 			self.forkTypes.plasma.material.ambient.setRGB(1.0, 0.3, 1.0);
-			for (var i = 0; i < 20; ++i) {
+			for (var i = 0; i < 40; ++i) {
 				var fork = new Physijs.BoxMesh(geometry, self.forkTypes.plain.material, 100);
 				fork.damage = self.forkTypes.plain.damage;
 				self.forks.push(fork);
