@@ -8,7 +8,7 @@ var cache = new Cache();
 var passes = {};
 
 function init() {
-	scene = new Physijs.Scene();
+	scene = new Physijs.Scene({ fixedTimeStep: 1 / CONFIG.physicsFPS });
 	scene.setGravity(new THREE.Vector3(0, -10, 0));
 	scene.fog = new THREE.FogExp2(0x000000, 0.05);
 	scene.addEventListener('update', function() {

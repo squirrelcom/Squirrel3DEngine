@@ -22,6 +22,7 @@ var CONFIG = {
 	fullscreen: false,
 	showStats: true,
 	quarterMode: false,
+	physicsFPS: 60,
 	sounds: true,
 	postprocessing: true,
 	particles: true,

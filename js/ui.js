@@ -56,6 +56,7 @@ function initUI() {
 	var gui = new dat.GUI();
 	gui.add(CONFIG, "fullscreen").onChange(updateConfig);
 	gui.add(CONFIG, "quarterMode").onChange(function() { updateConfig(); onWindowResize(); });
+	gui.add(CONFIG, "physicsFPS", 30, 100).step(10).onChange(updateConfig);
 	gui.add(CONFIG, "showStats").onChange(updateConfig);
 	gui.add(CONFIG, "sounds").onChange(updateConfig);
 	gui.add(controls, "mouseFallback");
