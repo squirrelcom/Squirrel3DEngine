@@ -53,6 +53,7 @@ function init() {
 	pl.bullets = pl.bulletsPerClip;
 	pl.clips = 5;
 	pl.ammoType = "plain";
+	pl.reloading = false;
 	pl.faction = 0;
 	updateHUD();
 
@@ -167,19 +168,18 @@ function shoot(type, faction, pos, rot, off, flip) {
 	fork.visible = true;
 }
 
-var reloading = false;
 function reload() {
-	if (reloading || pl.bullets >= pl.bulletsPerClip) return;
+	if (pl.reloading || pl.bullets >= pl.bulletsPerClip) return;
 	if (pl.clips <= 0) {
 		displayMinorMessage("Out of ammo");
 		return;
 	}
-	reloading = true;
+	pl.reloading = true;
 	window.setTimeout(function() {
 		pl.bullets = pl.bulletsPerClip;
 		--pl.clips;
 		updateHUD();
-		reloading = false;
+		pl.reloading = false;
 		pl.rhand.material.materials[2] = pl.rhand.ammoGood;
 		pl.rhand.materialNeedsUpdate = true;
 	}, 2000);
@@ -188,11 +188,11 @@ function reload() {
 
 var projector = new THREE.Projector();
 function mouseHandler(button) {
-	if (button == 0 && pl.rhand && pl.bullets <= 0 && !reloading) {
+	if (button == 0 && pl.rhand && pl.bullets <= 0 && !pl.reloading) {
 		// Clip empty, force reload if there is more
 		soundManager.play("shoot-dry");
 		reload();
-	} else if (button == 0 && pl.rhand && pl.bullets > 0 && !reloading) {
+	} else if (button == 0 && pl.rhand && pl.bullets > 0 && !pl.reloading) {
 		// Shoot!
 		--pl.bullets;
 		if (pl.bullets <= 0) {
