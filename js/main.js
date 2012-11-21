@@ -249,16 +249,6 @@ function animate(dt) {
 		pl.rhand.translateY(0.2);
 		pl.rhand.translateZ(-1.0);
 	}
-
-	// Trigger?
-	var trigger = dungeon.getTriggerAt(pl.position);
-	if (trigger) {
-		if (trigger.type == "message") displayMessage(trigger.message);
-	}
-
-	// Exit?
-	if (dungeon.isAtExit(pl.position))
-		resetLevel(dungeon.level.next);
 }
 
 $(document).ready(function() {
@@ -281,15 +271,6 @@ $(document).ready(function() {
 	function render() {
 		requestAnimationFrame(render);
 		if (!dungeon.loaded) return;
-
-		if (!pl.dead && pl.hp <= 0) {
-			// Oh noes, death!
-			pl.dead = true;
-			controls.active = false;
-			if (!$("#deathscreen").is(':visible'))
-				$("#deathscreen").fadeIn(500);
-			$("#instructions").hide();
-		}
 
 		// Player movement, controls and physics
 		var dt = clock.getDelta();
@@ -314,11 +295,8 @@ $(document).ready(function() {
 		// FIXME: 0.5 below is magic number to rise camera
 		controls.object.position.set(pl.position.x, pl.position.y + 0.5, pl.position.z);
 
-		if (!pl.dead) {
-			aiManager.process(dt);
-			animate(dt);
-			lightManager.update(pl);
-		}
+		if (!pl.dead) animate(dt);
+
 		renderer.clear();
 		if (CONFIG.postprocessing) {
 			renderer.shadowMapEnabled = CONFIG.shadows;
@@ -337,5 +315,30 @@ $(document).ready(function() {
 	}
 
 	init();
+
+	window.setInterval(function() { lightManager.update(pl); }, 690);
+	window.setInterval(function() { if (!pl.dead) aiManager.process(); }, 100);
+	// Main game logic updater
+	window.setInterval(function() {
+		if (!pl.dead && pl.hp <= 0) {
+			// Oh noes, death!
+			pl.dead = true;
+			controls.active = false;
+			if (!$("#deathscreen").is(':visible'))
+				$("#deathscreen").fadeIn(500);
+			$("#instructions").hide();
+		}
+
+		// Trigger?
+		var trigger = dungeon.getTriggerAt(pl.position);
+		if (trigger) {
+			if (trigger.type == "message") displayMessage(trigger.message);
+		}
+
+		// Exit?
+		if (dungeon.isAtExit(pl.position))
+			resetLevel(dungeon.level.next);
+	}, 100);
+
 	render();
 });

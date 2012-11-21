@@ -1,17 +1,15 @@
 
 function AIManager() {
-	var timeAccumulator = 0;
-
 	var v = new THREE.Vector3();
 
-	function walkTowards(monster, pos, sq_thres, dt) {
+	function walkTowards(monster, pos, sq_thres) {
 		v.copy(pos);
 		v.subSelf(monster.position);
 		v.y = 0;
 		if (monster.mesh) monster.mesh.lookAt(v.normalize());
 		else monster.lookAt(v.normalize());
 		if (monster.position.distanceToSquared(pos) >= sq_thres) {
-			monster.setLinearVelocity(v.multiplyScalar(monster.speed * dt));
+			monster.setLinearVelocity(v.multiplyScalar(monster.speed));
 			if (monster.mesh) monster.mesh.animate = true;
 			return false;
 		} else {
@@ -21,12 +19,7 @@ function AIManager() {
 		}
 	}
 
-	this.process = function(dt) {
-		// AI processing doesn't need to run each loop
-		timeAccumulator += dt;
-		if (timeAccumulator < 0.050) return;
-		else timeAccumulator = 0;
-
+	this.process = function() {
 		var i, j;
 		var gridSize = dungeon.level.gridSize;
 		// TODO: Should probably keep own collection
@@ -43,9 +36,9 @@ function AIManager() {
 				monster.activated = true;
 				monster.waypoints = null; // Clear waypoints
 				// Look at player
-				walkTowards(monster, pl.position, 12, dt);
+				walkTowards(monster, pl.position, 12);
 				// Shoot?
-				if (Math.random() < 0.05) {
+				if (Math.random() < 0.1) {
 					shoot("plain", monster.position, monster.mesh ? monster.mesh.rotation : monster.rotation, v.set(0, 0.11, -1.2), true);
 				}
 
@@ -67,7 +60,7 @@ function AIManager() {
 			if (monster.waypoints) {
 				if (!monster.waypoints.length)
 					monster.waypoints = null;
-				else if (walkTowards(monster, monster.waypoints[0], 1, dt)) {
+				else if (walkTowards(monster, monster.waypoints[0], 1)) {
 					// Move on to the next waypoint
 					monster.waypoints.splice(0, 1);
 				}
