@@ -1,7 +1,7 @@
 "use strict";
 function Dungeon(scene, player, levelName) {
 	var self = this;
-	this.loaded = false;
+	this.onLoad = null;
 	this.objects = [];
 	this.monsters = [];
 	this.grid = null;
@@ -514,7 +514,10 @@ function Dungeon(scene, player, levelName) {
 			dontCrossCorners: true,
 			heurestic: PF.Heuristic.euclidean
 		});
-		self.loaded = true;
+		// Callback
+		if (self.onLoad) self.onLoad();
+		else self.onLoad = true;
+
 		if (level.title) displayMessage(level.title);
 	}
 
@@ -531,6 +534,10 @@ function Dungeon(scene, player, levelName) {
 
 	this.serialize = function() {
 		return JSON.stringify(this.level);
-	}
+	};
 
+	this.ready = function(callback) {
+		if (this.onLoad === true) callback();
+		else this.onLoad = callback;
+	};
 }

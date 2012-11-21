@@ -215,7 +215,6 @@ function mouseHandler(button) {
 }
 
 function animate(dt) {
-	if (!dungeon.loaded) return;
 	function getAnim(time) { return Math.abs(time - (time|0) - 0.5) * 2.0; }
 	function fract(num) { return num - (num|0); }
 	var i, v = new THREE.Vector3();
@@ -260,7 +259,6 @@ $(document).ready(function() {
 
 	function render() {
 		requestAnimationFrame(render);
-		if (!dungeon.loaded) return;
 
 		// Player movement, controls and physics
 		var dt = clock.getDelta();
@@ -308,29 +306,31 @@ $(document).ready(function() {
 
 	init();
 
-	window.setInterval(function() { lightManager.update(pl); }, 690);
-	window.setInterval(function() { if (!pl.dead) aiManager.process(); }, 100);
-	// Main game logic updater
-	window.setInterval(function() {
-		if (!pl.dead && pl.hp <= 0) {
-			// Oh noes, death!
-			pl.dead = true;
-			controls.active = false;
-			if (!$("#deathscreen").is(':visible'))
-				$("#deathscreen").fadeIn(500);
-			$("#instructions").hide();
-		}
+	dungeon.ready(function() {
+		window.setInterval(function() { lightManager.update(pl); }, 690);
+		window.setInterval(function() { if (!pl.dead) aiManager.process(); }, 100);
+		// Main game logic updater
+		window.setInterval(function() {
+			if (!pl.dead && pl.hp <= 0) {
+				// Oh noes, death!
+				pl.dead = true;
+				controls.active = false;
+				if (!$("#deathscreen").is(':visible'))
+					$("#deathscreen").fadeIn(500);
+				$("#instructions").hide();
+			}
 
-		// Trigger?
-		var trigger = dungeon.getTriggerAt(pl.position);
-		if (trigger) {
-			if (trigger.type == "message") displayMessage(trigger.message);
-		}
+			// Trigger?
+			var trigger = dungeon.getTriggerAt(pl.position);
+			if (trigger) {
+				if (trigger.type == "message") displayMessage(trigger.message);
+			}
 
-		// Exit?
-		if (dungeon.isAtExit(pl.position))
-			resetLevel(dungeon.level.next);
-	}, 45);
+			// Exit?
+			if (dungeon.isAtExit(pl.position))
+				resetLevel(dungeon.level.next);
+		}, 45);
 
-	render();
+		render();
+	});
 });
