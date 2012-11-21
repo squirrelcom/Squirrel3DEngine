@@ -38,7 +38,7 @@ function init() {
 			other.parent.remove(other);
 		}
 		if (other.damage) {
-			if (vel.lengthSq() < 5) return;
+			if (vel.lengthSq() < 5 || other.position.y < 0.3) return;
 			this.hp -= other.damage;
 			updateHUD();
 			// Death is checked in render loop

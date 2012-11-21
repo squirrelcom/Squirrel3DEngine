@@ -109,8 +109,9 @@ function Dungeon(scene, player, levelName) {
 				if (other.damage && def.sound)
 					soundManager.playSpatial(def.sound, other.position, 10);
 				if (this.dead) return;
-				if (this.hp && other.damage) {
+				if (this.hp && other.damage && other.position.y > 0.3) {
 					this.hp -= other.damage;
+					other.damage = 0;
 					// Check for death
 					if (this.hp <= 0) {
 						soundManager.playSpatial("robot-death", 20);
