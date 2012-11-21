@@ -94,6 +94,7 @@ function Dungeon(scene, player, levelName) {
 
 			if (def.character) {
 				if (def.character.hp) obj.hp = def.character.hp;
+				obj.faction = def.character.faction || 1;
 				self.monsters.push(obj);
 			}
 
@@ -109,7 +110,7 @@ function Dungeon(scene, player, levelName) {
 				if (other.damage && def.sound)
 					soundManager.playSpatial(def.sound, other.position, 10);
 				if (this.dead) return;
-				if (this.hp && other.damage && other.position.y > 0.3) {
+				if (this.hp && other.damage && other.position.y > 0.3 && this.faction != other.faction) {
 					this.hp -= other.damage;
 					other.damage = 0;
 					// Check for death

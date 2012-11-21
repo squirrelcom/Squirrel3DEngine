@@ -37,8 +37,7 @@ function init() {
 			other.visible = false;
 			other.parent.remove(other);
 		}
-		if (other.damage) {
-			if (vel.lengthSq() < 5 || other.position.y < 0.3) return;
+		if (other.damage && other.position.y > 0.3 && pl.faction != other.faction) {
 			this.hp -= other.damage;
 			updateHUD();
 			// Death is checked in render loop
@@ -54,6 +53,7 @@ function init() {
 	pl.bullets = pl.bulletsPerClip;
 	pl.clips = 5;
 	pl.ammoType = "plain";
+	pl.faction = 0;
 	updateHUD();
 
 	pl.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 25);
@@ -144,12 +144,13 @@ function resetLevel(levelName) {
 }
 
 var shootVector = new THREE.Vector3();
-function shoot(type, pos, rot, off, flip) {
+function shoot(type, faction, pos, rot, off, flip) {
 	soundManager.playSpatial("shoot", pos, 20);
 	var fork = dungeon.forks[dungeon.forkIndex];
 	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
 	fork.damage = dungeon.forkTypes[type].damage;
 	fork.material = dungeon.forkTypes[type].material;
+	fork.faction = faction;
 	fork.position.copy(pos);
 	fork.rotation.copy(rot);
 	if (flip) fork.rotation.y += Math.PI;
@@ -198,7 +199,7 @@ function mouseHandler(button) {
 			pl.rhand.material.materials[2] = pl.rhand.ammoOut;
 			pl.rhand.materialNeedsUpdate = true;
 		}
-		shoot(pl.ammoType, pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
+		shoot(pl.ammoType, pl.faction, pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
 		updateHUD();
 	} else if (button == 2) {
 		// Punch/push
