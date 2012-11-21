@@ -2,7 +2,7 @@
 	"title": "Fuel Depot",
 	"next": "04-engine-room",
 	"roomHeight": 3,
-	"gridSize": 2,
+	"gridSize": 3,
 	"width": 40,
 	"depth": 40,
 	"map": [

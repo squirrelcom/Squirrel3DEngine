@@ -6,7 +6,7 @@
 		"floor": "metal-colored-02"
 	},
 	"roomHeight": 3,
-	"gridSize": 2,
+	"gridSize": 3,
 	"lights": [
 		{
 			"position": {

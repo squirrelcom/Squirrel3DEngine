@@ -2,7 +2,7 @@
 	"title": "Intro",
 	"next": "02-corridor",
 	"roomHeight": 3,
-	"gridSize": 2,
+	"gridSize": 3,
 	"width": 40,
 	"depth": 40,
 	"map": [
