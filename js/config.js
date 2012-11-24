@@ -50,6 +50,7 @@ var updateConfig = function() {
 	passes.bloom.enabled = CONFIG.bloom;
 	passes.ssao.enabled = CONFIG.SSAO;
 	passes.fxaa.enabled = CONFIG.FXAA;
+	scene.setFixedTimeStep(1 / CONFIG.physicsFPS);
 	var statDisplay = CONFIG.showStats ? "block" : "none";
 	if (renderStats) renderStats.domElement.style.display = statDisplay;
 	if (physicsStats) physicsStats.domElement.style.display = statDisplay;
