@@ -119,7 +119,7 @@ function init() {
 	depthPassPlugin.renderTarget = depthTarget;
 	renderer.addPrePlugin(depthPassPlugin);
 
-	if (CONFIG.quarterMode) onWindowResize();
+	if (CONFIG.resolution != 1.0) onWindowResize();
 
 	resetLevel();
 	updateConfig();

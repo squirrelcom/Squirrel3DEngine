@@ -21,7 +21,7 @@ var hashParams = (function() {
 var CONFIG = {
 	fullscreen: false,
 	showStats: true,
-	quarterMode: false,
+	resolution: 1.0,
 	physicsFPS: 60,
 	sounds: true,
 	postprocessing: true,

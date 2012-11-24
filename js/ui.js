@@ -55,7 +55,7 @@ function initUI() {
 	// GUI controls
 	var gui = new dat.GUI();
 	gui.add(CONFIG, "fullscreen").onChange(updateConfig);
-	gui.add(CONFIG, "quarterMode").onChange(function() { updateConfig(); onWindowResize(); });
+	gui.add(CONFIG, "resolution", 0.1, 1.0).step(0.1).onChange(function() { updateConfig(); onWindowResize(); });
 	gui.add(CONFIG, "physicsFPS", 30, 100).step(10).onChange(updateConfig);
 	gui.add(CONFIG, "showStats").onChange(updateConfig);
 	gui.add(CONFIG, "sounds").onChange(updateConfig);
@@ -116,7 +116,7 @@ function editLevel() {
 }
 
 function onWindowResize() {
-	var scale = CONFIG.quarterMode ? 0.5 : 1;
+	var scale = CONFIG.resolution;
 	pl.camera.aspect = window.innerWidth / window.innerHeight;
 	pl.camera.updateProjectionMatrix();
 	renderer.setSize(window.innerWidth * scale, window.innerHeight * scale);
