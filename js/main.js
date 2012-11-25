@@ -165,7 +165,8 @@ function shoot(obj, type, faction, off, flip) {
 	// Physics
 	bullet.__dirtyPosition = true;
 	bullet.__dirtyRotation = true;
-	bullet.setLinearVelocity(shootVector.multiplyScalar(25.0));
+	var velObj = obj.parent instanceof THREE.Scene ? obj : obj.parent;
+	bullet.setLinearVelocity(shootVector.multiplyScalar(25.0).addSelf(velObj.getLinearVelocity()));
 	// Gameplay properties
 	bullet.damage = dungeon.forkTypes[type].damage;
 	bullet.material = dungeon.forkTypes[type].material;
