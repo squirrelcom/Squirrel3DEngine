@@ -147,31 +147,30 @@ function resetLevel(levelName) {
 
 var shootVector = new THREE.Vector3();
 function shoot(type, faction, obj, off, flip) {
-	var fork = dungeon.forks[dungeon.forkIndex];
+	var bullet = dungeon.forks[dungeon.forkIndex];
 	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
-	fork.position.copy(obj.matrixWorld.getPosition());
+	bullet.position.copy(obj.matrixWorld.getPosition());
 	// Play sounds as early as possible
-	soundManager.playSpatial("shoot", fork.position, 20);
+	soundManager.playSpatial("shoot", bullet.position, 20);
 	// Figure out the direction
-	fork.matrixRotationWorld.extractRotation(obj.matrixWorld);
-	if (flip) fork.matrixRotationWorld.rotateY(Math.PI);
-	fork.rotation.setEulerFromRotationMatrix(fork.matrixRotationWorld);
-	fork.updateMatrix();
-	shootVector.set(0, 0, 1);
-	fork.matrixRotationWorld.multiplyVector3(shootVector);
+	bullet.matrixRotationWorld.extractRotation(obj.matrixWorld);
+	if (flip) bullet.matrixRotationWorld.rotateY(Math.PI);
+	bullet.rotation.setEulerFromRotationMatrix(bullet.matrixRotationWorld);
+	bullet.updateMatrix();
+	bullet.matrixRotationWorld.multiplyVector3(shootVector.set(0, 0, 1));
 	// Offset launch point
-	fork.translateX(off.x);
-	fork.translateY(off.y);
-	fork.translateZ(off.z);
+	bullet.translateX(off.x);
+	bullet.translateY(off.y);
+	bullet.translateZ(off.z);
 	// Physics
-	fork.__dirtyPosition = true;
-	fork.__dirtyRotation = true;
-	fork.setLinearVelocity(shootVector.multiplyScalar(25.0));
+	bullet.__dirtyPosition = true;
+	bullet.__dirtyRotation = true;
+	bullet.setLinearVelocity(shootVector.multiplyScalar(25.0));
 	// Gameplay properties
-	fork.damage = dungeon.forkTypes[type].damage;
-	fork.material = dungeon.forkTypes[type].material;
-	fork.faction = faction;
-	fork.visible = true;
+	bullet.damage = dungeon.forkTypes[type].damage;
+	bullet.material = dungeon.forkTypes[type].material;
+	bullet.faction = faction;
+	bullet.visible = true;
 }
 
 function reload() {
