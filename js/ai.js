@@ -17,8 +17,9 @@ function AIManager() {
 		// Difference in angle
 		var angleTo = Math.atan2(v1.z, v1.x) - Math.atan2(v2.z, v2.x);
 		if (angleTo > Math.PI) angleTo -= Math.PI * 2;
+		if (angleTo < -Math.PI) angleTo += Math.PI * 2;
 		// Set angular speed
-		var turnSpeed = angleTo * turnGain;
+		var turnSpeed = turnGain * angleTo;
 		monster.setAngularVelocity(v1.set(0, turnSpeed, 0));
 		// Linear speed and distance considerations
 		if (monster.position.distanceToSquared(pos) >= sq_thres) {
