@@ -10,6 +10,7 @@ function Dungeon(scene, player, levelName) {
 	var dummy_material = new THREE.MeshBasicMaterial({ color: 0x000000 });
 	var debug_material = new THREE.MeshBasicMaterial({ color: 0xff00ff });
 	var dead_material = new THREE.MeshLambertMaterial({ color: 0x222222, ambient: 0x222222 });
+	var dummy_geometry = new THREE.Geometry();
 
 	function objectHandler(level, pos, ang, def) {
 		return function(geometry, materials) {
@@ -84,6 +85,9 @@ function Dungeon(scene, player, levelName) {
 			// Handle animated meshes
 			if (def.animation) {
 				obj.visible = false;
+				// Switch the geometry to simple dummy one
+				obj.geometry = dummy_geometry;
+				// Create the animated mesh for displaying
 				obj.mesh = animationManager.createAnimatedMesh(geometry, materials, def);
 				if (!def.noShadows) {
 					obj.mesh.castShadow = true;
