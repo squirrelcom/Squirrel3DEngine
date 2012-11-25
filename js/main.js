@@ -146,7 +146,7 @@ function resetLevel(levelName) {
 }
 
 var shootVector = new THREE.Vector3();
-function shoot(type, faction, obj, off, flip) {
+function shoot(obj, type, faction, off, flip) {
 	var bullet = dungeon.forks[dungeon.forkIndex];
 	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
 	bullet.position.copy(obj.matrixWorld.getPosition());
@@ -203,7 +203,7 @@ function mouseHandler(button) {
 			pl.rhand.material.materials[2] = pl.rhand.ammoOut;
 			pl.rhand.materialNeedsUpdate = true;
 		}
-		shoot(pl.ammoType, pl.faction, pl.rhand, { x: 0.0, y: 0.11, z: 1.0 }, true);
+		shoot(pl.rhand, pl.ammoType, pl.faction, { x: 0.0, y: 0.11, z: 1.0 }, true);
 		updateHUD();
 	} else if (button == 2) {
 		// Punch/push
