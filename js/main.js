@@ -265,6 +265,7 @@ $(document).ready(function() {
 
 	function render() {
 		requestAnimationFrame(render);
+		if (pl.dead) return;
 
 		// Player movement, controls and physics
 		var dt = clock.getDelta();
@@ -291,7 +292,7 @@ $(document).ready(function() {
 		pl.rotation.copy(pl.camera.rotation);
 		pl.__dirtyRotation = true;
 
-		if (!pl.dead) animate(dt);
+		animate(dt);
 
 		renderer.clear();
 		if (CONFIG.postprocessing) {
