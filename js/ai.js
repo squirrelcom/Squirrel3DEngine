@@ -17,7 +17,6 @@ function AIManager() {
 		// Difference in angle
 		var angleTo = Math.atan2(v1.z, v1.x) - Math.atan2(v2.z, v2.x);
 		if (angleTo > Math.PI) angleTo -= Math.PI * 2;
-		console.log(angleTo);
 		// Set angular speed
 		var turnSpeed = angleTo * turnGain;
 		monster.setAngularVelocity(v1.set(0, turnSpeed, 0));
@@ -53,7 +52,7 @@ function AIManager() {
 				walkTowards(monster, pl.position, 12);
 				// Shoot?
 				if (Math.random() < 0.333) {
-					shoot("plain", monster.faction, monster.position, monster.rotation, v1.set(0, 0.11, -1.2), true);
+					shoot("plain", monster.faction, monster, v1.set(0, 0.11, 1.2));
 				}
 
 			// Target lost? Let's find a path

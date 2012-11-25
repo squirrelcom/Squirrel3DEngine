@@ -3,6 +3,7 @@ var pl, controls, scene, renderer, composer;
 var renderTargetParametersRGBA, renderTargetParametersRGB;
 var colorTarget, depthTarget, depthPassPlugin;
 var lightManager, animationManager, soundManager, aiManager, dungeon;
+var projector = new THREE.Projector();
 var clock = new THREE.Clock();
 var cache = new Cache();
 var passes = {};
@@ -145,26 +146,31 @@ function resetLevel(levelName) {
 }
 
 var shootVector = new THREE.Vector3();
-function shoot(type, faction, pos, rot, off, flip) {
-	soundManager.playSpatial("shoot", pos, 20);
+function shoot(type, faction, obj, off, flip) {
 	var fork = dungeon.forks[dungeon.forkIndex];
 	dungeon.forkIndex = (dungeon.forkIndex + 1) % dungeon.forks.length;
-	fork.damage = dungeon.forkTypes[type].damage;
-	fork.material = dungeon.forkTypes[type].material;
-	fork.faction = faction;
-	fork.position.copy(pos);
-	fork.rotation.copy(rot);
-	if (flip) fork.rotation.y += Math.PI;
-	fork.updateMatrixWorld();
-	fork.matrixRotationWorld.extractRotation(fork.matrixWorld);
-	shootVector.set(0, 0, -1);
+	fork.position.copy(obj.matrixWorld.getPosition());
+	// Play sounds as early as possible
+	soundManager.playSpatial("shoot", fork.position, 20);
+	// Figure out the direction
+	fork.matrixRotationWorld.extractRotation(obj.matrixWorld);
+	if (flip) fork.matrixRotationWorld.rotateY(Math.PI);
+	fork.rotation.setEulerFromRotationMatrix(fork.matrixRotationWorld);
+	fork.updateMatrix();
+	shootVector.set(0, 0, 1);
 	fork.matrixRotationWorld.multiplyVector3(shootVector);
+	// Offset launch point
 	fork.translateX(off.x);
 	fork.translateY(off.y);
 	fork.translateZ(off.z);
+	// Physics
 	fork.__dirtyPosition = true;
 	fork.__dirtyRotation = true;
 	fork.setLinearVelocity(shootVector.multiplyScalar(25.0));
+	// Gameplay properties
+	fork.damage = dungeon.forkTypes[type].damage;
+	fork.material = dungeon.forkTypes[type].material;
+	fork.faction = faction;
 	fork.visible = true;
 }
 
@@ -186,7 +192,6 @@ function reload() {
 	soundManager.play("reload");
 }
 
-var projector = new THREE.Projector();
 function mouseHandler(button) {
 	if (button == 0 && pl.rhand && pl.bullets <= 0 && !pl.reloading) {
 		// Clip empty, force reload if there is more
@@ -199,7 +204,7 @@ function mouseHandler(button) {
 			pl.rhand.material.materials[2] = pl.rhand.ammoOut;
 			pl.rhand.materialNeedsUpdate = true;
 		}
-		shoot(pl.ammoType, pl.faction, pl.position, pl.camera.rotation, { x: 0.2, y: 0.4, z: -1.2 });
+		shoot(pl.ammoType, pl.faction, pl.rhand, { x: 0.0, y: 0.11, z: 1.0 }, true);
 		updateHUD();
 	} else if (button == 2) {
 		// Punch/push
