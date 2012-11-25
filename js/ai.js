@@ -1,19 +1,33 @@
 
 function AIManager() {
-	var v = new THREE.Vector3();
+	var v1 = new THREE.Vector3();
+	var v2 = new THREE.Vector3();
+	var turnGain = 10;
 
 	function walkTowards(monster, pos, sq_thres) {
-		v.copy(pos);
-		v.subSelf(monster.position);
-		v.y = 0;
-		if (monster.mesh) monster.mesh.lookAt(v.normalize());
-		else monster.lookAt(v.normalize());
+		// Get monster's look vector in world space
+		monster.updateMatrixWorld();
+		monster.matrixRotationWorld.extractRotation(monster.matrixWorld);
+		monster.matrixRotationWorld.multiplyVector3(v1.set(0, 0, 1));
+		// Calculate target vector
+		v2.copy(pos);
+		v2.subSelf(monster.position);
+		v2.y = 0;
+		v2.normalize();
+		// Difference in angle
+		var angleTo = Math.atan2(v1.z, v1.x) - Math.atan2(v2.z, v2.x);
+		if (angleTo > Math.PI) angleTo -= Math.PI * 2;
+		console.log(angleTo);
+		// Set angular speed
+		var turnSpeed = angleTo * turnGain;
+		monster.setAngularVelocity(v1.set(0, turnSpeed, 0));
+		// Linear speed and distance considerations
 		if (monster.position.distanceToSquared(pos) >= sq_thres) {
-			monster.setLinearVelocity(v.multiplyScalar(monster.speed));
+			monster.setLinearVelocity(v2.multiplyScalar(monster.speed));
 			if (monster.mesh) monster.mesh.animate = true;
 			return false;
 		} else {
-			monster.setLinearVelocity(v.set(0, 0, 0));
+			monster.setLinearVelocity(v2.set(0, 0, 0));
 			if (monster.mesh) monster.mesh.animate = false;
 			return true;
 		}
@@ -39,7 +53,7 @@ function AIManager() {
 				walkTowards(monster, pl.position, 12);
 				// Shoot?
 				if (Math.random() < 0.333) {
-					shoot("plain", monster.faction, monster.position, monster.mesh ? monster.mesh.rotation : monster.rotation, v.set(0, 0.11, -1.2), true);
+					shoot("plain", monster.faction, monster.position, monster.rotation, v1.set(0, 0.11, -1.2), true);
 				}
 
 			// Target lost? Let's find a path
@@ -51,8 +65,8 @@ function AIManager() {
 				monster.waypoints = [];
 				//path = PF.Util.smoothenPath(dungeon.grid, path);
 				for (j = 0; j < path.length; ++j) {
-					v.set((path[j][0] + 0.5) * gridSize, monster.position.y, (path[j][1] + 0.5) * gridSize);
-					monster.waypoints.push(v.clone());
+					v1.set((path[j][0] + 0.5) * gridSize, monster.position.y, (path[j][1] + 0.5) * gridSize);
+					monster.waypoints.push(v1.clone());
 				}
 			}
 

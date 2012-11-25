@@ -77,7 +77,7 @@ function Dungeon(scene, player, levelName) {
 				obj.castShadow = true;
 				obj.receiveShadow = true;
 			}
-			if (mass === 0) {
+			if (mass === 0 && !def.character) {
 				obj.matrixAutoUpdate = false;
 				obj.updateMatrix();
 			}
@@ -123,6 +123,8 @@ function Dungeon(scene, player, levelName) {
 						this.dead = true;
 						if (this.mesh) this.mesh.animate = false;
 						this.setAngularFactor({ x: 1, y: 1, z: 1 });
+						this.setAngularVelocity({ x: 0, y: 0, z: 0 });
+						this.setLinearVelocity({ x: 0, y: 0, z: 0 });
 						this.mass = 2000;
 						if (this.mesh) this.mesh.material = dead_material;
 						else this.material = dead_material;
@@ -140,7 +142,7 @@ function Dungeon(scene, player, levelName) {
 
 			// Finalize
 			scene.add(obj);
-			if (def.character && def.collision) obj.setAngularFactor({ x: 0, y: 0, z: 0 });
+			if (def.character && def.collision) obj.setAngularFactor({ x: 0, y: 1, z: 0 });
 			if (def.character) obj.speed = def.character.speed;
 			if (def.door) {
 				obj.setAngularFactor({ x: 0, y: 1, z: 0 });
