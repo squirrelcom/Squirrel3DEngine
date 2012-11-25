@@ -49,11 +49,21 @@ function init() {
 	// Add pl later to the scene
 
 	// Player stats
-	pl.hp = 100;
-	pl.bulletsPerClip = 15;
-	pl.bullets = pl.bulletsPerClip;
-	pl.clips = 5;
-	pl.ammoType = "plain";
+	var loadedStats = {};
+	if (hashParams.level && localStorage.getItem("campaingState-" + hashParams.level)) {
+		loadedStats = JSON.parse(localStorage.getItem("campaingState-" + hashParams.level));
+		pl.hp = loadedStats.hp;
+		pl.bulletsPerClip = loadedStats.bulletsPerClip;
+		pl.bullets = loadedStats.bullets;
+		pl.clips = loadedStats.clips;
+		pl.ammoType = loadedStats.ammoType || "plain";
+	} else {
+		pl.hp = 100;
+		pl.bulletsPerClip = 15;
+		pl.bullets = pl.bulletsPerClip;
+		pl.clips = 5;
+		pl.ammoType = "plain";
+	}
 	pl.reloading = false;
 	pl.faction = 0;
 	updateHUD();
@@ -143,6 +153,17 @@ function resetLevel(levelName) {
 	soundManager = new SoundManager();
 	aiManager = new AIManager();
 	dungeon = new Dungeon(scene, pl, levelName);
+}
+
+function savePlayerState(levelName) {
+	var state = {
+		hp: pl.hp,
+		bulletsPerClip: pl.bulletsPerClip,
+		bullets: pl.bullets,
+		clips: pl.clips,
+		ammoType: pl.ammoType
+	};
+	localStorage.setItem("campaingState-" + levelName, JSON.stringify(state));
 }
 
 var shootVector = new THREE.Vector3();
@@ -334,8 +355,10 @@ $(document).ready(function() {
 			}
 
 			// Exit?
-			if (dungeon.isAtExit(pl.position))
+			if (dungeon.isAtExit(pl.position)) {
+				savePlayerState(dungeon.level.next);
 				resetLevel(dungeon.level.next);
+			}
 		}, 45);
 
 		render();
