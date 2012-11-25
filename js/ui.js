@@ -16,10 +16,15 @@ function initUI() {
 	physicsStats.domElement.style.left = '85px';
 	container.appendChild(physicsStats.domElement);
 
+	if (!CONFIG.showStats) {
+		renderStats.domElement.style.display = "none";
+		physicsStats.domElement.style.display = "none";
+	}
+
 	rendererInfo = document.getElementById("renderer-info");
 
 	container.requestPointerLock = container.requestPointerLock ||
-			container.mozRequestPointerLock || container.webkitRequestPointerLock;
+		container.mozRequestPointerLock || container.webkitRequestPointerLock;
 
 	container.requestFullscreen = container.requestFullscreen ||
 		container.mozRequestFullscreen || container.mozRequestFullScreen || container.webkitRequestFullscreen;
