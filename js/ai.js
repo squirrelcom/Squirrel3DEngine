@@ -2,7 +2,8 @@
 function AIManager() {
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
-	var turnGain = 10;
+	var turnGain = 6;
+	var maxTurnSpeed = Math.PI/16;
 
 	function walkTowards(monster, pos, sq_thres) {
 		// Get monster's look vector in world space
@@ -15,15 +16,18 @@ function AIManager() {
 		v2.y = 0;
 		v2.normalize();
 		// Difference in angle
-		var angleTo = Math.atan2(v1.z, v1.x) - Math.atan2(v2.z, v2.x);
-		if (angleTo > Math.PI) angleTo -= Math.PI * 2;
-		if (angleTo < -Math.PI) angleTo += Math.PI * 2;
+		var angleDiff = Math.atan2(v1.z, v1.x) - Math.atan2(v2.z, v2.x);
+		if (angleDiff > Math.PI) angleDiff -= Math.PI * 2;
 		// Set angular speed
-		var turnSpeed = turnGain * angleTo;
+		var turnSpeed = turnGain * angleDiff;
+		if (turnSpeed >  maxTurnSpeed) turnSpeed =  maxTurnSpeed;
+		if (turnSpeed < -maxTurnSpeed) turnSpeed = -maxTurnSpeed;
 		monster.setAngularVelocity(v1.set(0, turnSpeed, 0));
 		// Linear speed and distance considerations
 		if (monster.position.distanceToSquared(pos) >= sq_thres) {
-			monster.setLinearVelocity(v2.multiplyScalar(monster.speed));
+			if (Math.abs(angleDiff) < Math.PI / 4)
+				monster.setLinearVelocity(v2.multiplyScalar(monster.speed));
+			else monster.setLinearVelocity(v2.set(0, 0, 0));
 			if (monster.mesh) monster.mesh.animate = true;
 			return false;
 		} else {
