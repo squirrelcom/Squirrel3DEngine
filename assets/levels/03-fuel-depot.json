@@ -407,6 +407,27 @@
 				"x": 13.4375,
 				"z": 18.4375
 			}
+		},
+		{
+			"name": "health-box",
+			"position": {
+				"x": 21.5625,
+				"z": 3.375
+			}
+		},
+		{
+			"name": "health-box",
+			"position": {
+				"x": 13.5,
+				"z": 17.5
+			}
+		},
+		{
+			"name": "health-box",
+			"position": {
+				"x": 18.5625,
+				"z": 20.5
+			}
 		}
 	],
 	"monsters": [
@@ -485,7 +506,7 @@
 		{
 			"type": "message",
 			"position": {
-				"x": 6,
+				"x": 5.5,
 				"z": 5.5
 			},
 			"message": "Probably some more robots ahead..."

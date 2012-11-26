@@ -183,6 +183,14 @@
 		}
 	],
 	"items": [],
-	"monsters": [],
+	"monsters": [
+		{
+			"name": "robot",
+			"position": {
+				"x": 13.5625,
+				"z": 18.4375
+			}
+		}
+	],
 	"triggers": []
 }
