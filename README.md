@@ -1,17 +1,11 @@
 Plasma Forks
 ============
 
-This is a small 3d sci-fi first-person shooter for the web.
+This is a small 3d sci-fi first-person shooter for the web.  
+See more info at the homepage - http://tapio.github.com/plasma-forks/
 
-
-System Requirements
--------------------
-
-* Latest version of Chrome or Firefox
-	* Chrome offers noticeable better performance and more features
-	* IE does not support WebGL and Opera is broken
-* Good dedicated GPU and drivers (both must not be blacklisted for WebGL by the browser vendors)
-* Decent CPU so that JavaScript runs well
+**You will need poweful, dedicated GPU, blazingly fast CPU and Chrome to fully enjoy it.**  
+Check out [Known Issues](https://github.com/tapio/plasma-forks/wiki/Known-Issues) and [Performance Tips](https://github.com/tapio/plasma-forks/wiki/Performance-Tips) if you want to go against that.
 
 
 Acknowledgements
