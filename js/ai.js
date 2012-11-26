@@ -2,8 +2,8 @@
 function AIManager() {
 	var v1 = new THREE.Vector3();
 	var v2 = new THREE.Vector3();
-	var turnGain = 6;
-	var maxTurnSpeed = Math.PI/16;
+	var turnGain = 10;
+	var maxTurnSpeed = Math.PI;
 
 	function walkTowards(monster, pos, sq_thres) {
 		// Get monster's look vector in world space
