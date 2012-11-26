@@ -436,7 +436,8 @@ function Dungeon(scene, player, levelName) {
 		for (var i = 0; i < level.monsters.length; ++i) {
 			var name = level.monsters[i].name;
 			cache.loadModel("assets/monsters/" + name + "/" + name + ".js",
-				objectHandler(level, new THREE.Vector3().copy(level.monsters[i].position), 0, assets.monsters[name]));
+				objectHandler(level, new THREE.Vector3().copy(level.monsters[i].position),
+					level.monsters[i].angle, assets.monsters[name]));
 		}
 	};
 
