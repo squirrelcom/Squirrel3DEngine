@@ -425,7 +425,7 @@ function Dungeon(scene, player, levelName) {
 		if (!level.items) return;
 		for (var i = 0; i < level.items.length; ++i) {
 			var name = level.items[i].name;
-			cache.loadModel("assets/items/" + name + "/" + name + ".js",
+			cache.loadModel("assets/models/" + name + "/" + name + ".js",
 				objectHandler(level, new THREE.Vector3().copy(level.items[i].position),
 					level.items[i].angle, assets.items[name]));
 		}
@@ -435,7 +435,7 @@ function Dungeon(scene, player, levelName) {
 		if (!level.monsters) return;
 		for (var i = 0; i < level.monsters.length; ++i) {
 			var name = level.monsters[i].name;
-			cache.loadModel("assets/monsters/" + name + "/" + name + ".js",
+			cache.loadModel("assets/models/" + name + "/" + name + ".js",
 				objectHandler(level, new THREE.Vector3().copy(level.monsters[i].position),
 					level.monsters[i].angle, assets.monsters[name]));
 		}
@@ -471,7 +471,7 @@ function Dungeon(scene, player, levelName) {
 			controls.setYAngle(level.startAngle);
 
 		// Player gun
-		cache.loadModel("assets/items/gun/gun.js", function(geometry, materials) {
+		cache.loadModel("assets/models/gun/gun.js", function(geometry, materials) {
 			player.rhand = new Physijs.BoxMesh(geometry, new THREE.MeshFaceMaterial(materials));
 			// Hack: Materials for gun screen in order to show ammo is out differently
 			player.rhand.ammoGood = materials[2].clone();
@@ -487,7 +487,7 @@ function Dungeon(scene, player, levelName) {
 		});
 
 		// Bullets
-		cache.loadModel("assets/items/fork/fork.js", function(geometry, materials) {
+		cache.loadModel("assets/models/fork/fork.js", function(geometry, materials) {
 			self.forks = [];
 			self.forkIndex = 0;
 			self.forkTypes = {
