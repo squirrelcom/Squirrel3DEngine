@@ -13,7 +13,7 @@ function Cache() {
 	document.body.appendChild(loader.statusDomElement);
 	var modelsPending = 0;
 
-	this.loadModel = function(path, callback) {
+	this.loadModel = function(path, callback, texturePath) {
 		var m = this.models[path];
 		if (!m) { // First time request for this model
 			this.models[path] = [ callback ];
@@ -28,7 +28,7 @@ function Cache() {
 				modelsPending--;
 				if (modelsPending == 0)
 					loader.statusDomElement.style.display = "none";
-			});
+			}, texturePath);
 		} else if (m instanceof Array) { // Pending
 			m.push(callback);
 		} else // Already loaded

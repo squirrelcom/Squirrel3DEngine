@@ -12,6 +12,10 @@ function Dungeon(scene, player, levelName) {
 	var dead_material = new THREE.MeshLambertMaterial({ color: 0x222222, ambient: 0x222222 });
 	var dummy_geometry = new THREE.Geometry();
 
+	var modelTexturePath = "assets/models/";
+	if (CONFIG.textureQuality === 0) modelTexturePath = "assets/models-256/";
+	else if (CONFIG.textureQuality == 1) modelTexturePath = "assets/models-512/";
+
 	function objectHandler(level, pos, ang, def) {
 		return function(geometry, materials) {
 			if (!def) def = {};
@@ -385,7 +389,8 @@ function Dungeon(scene, player, levelName) {
 			lightManager.addShadow(light2);
 
 			// Mesh
-			cache.loadModel("assets/models/" + name + "/" + name + ".js", torchHandler(modelPos, 0/*snapped.a*/));
+			cache.loadModel("assets/models/" + name + "/" + name + ".js", torchHandler(modelPos, 0/*snapped.a*/),
+				modelTexturePath + name);
 
 			// Flame
 			//if (CONFIG.particles)
@@ -417,7 +422,8 @@ function Dungeon(scene, player, levelName) {
 			var name = level.objects[i].name;
 			cache.loadModel("assets/models/" + name + "/" + name + ".js",
 				objectHandler(level, new THREE.Vector3().copy(level.objects[i].position),
-					level.objects[i].angle, assets.objects[name]));
+					level.objects[i].angle, assets.objects[name]),
+				modelTexturePath + name);
 		}
 	};
 
@@ -427,7 +433,8 @@ function Dungeon(scene, player, levelName) {
 			var name = level.items[i].name;
 			cache.loadModel("assets/models/" + name + "/" + name + ".js",
 				objectHandler(level, new THREE.Vector3().copy(level.items[i].position),
-					level.items[i].angle, assets.items[name]));
+					level.items[i].angle, assets.items[name]),
+				modelTexturePath + name);
 		}
 	};
 
@@ -437,7 +444,8 @@ function Dungeon(scene, player, levelName) {
 			var name = level.monsters[i].name;
 			cache.loadModel("assets/models/" + name + "/" + name + ".js",
 				objectHandler(level, new THREE.Vector3().copy(level.monsters[i].position),
-					level.monsters[i].angle, assets.monsters[name]));
+					level.monsters[i].angle, assets.monsters[name]),
+				modelTexturePath + name);
 		}
 	};
 
@@ -484,7 +492,7 @@ function Dungeon(scene, player, levelName) {
 			player.add(player.rhand);
 			scene.add(player); // Here player is added to the scene
 			player.setAngularFactor({ x: 0, y: 0, z: 0 });
-		});
+		}, modelTexturePath + "gun");
 
 		// Bullets
 		cache.loadModel("assets/models/fork/fork.js", function(geometry, materials) {

@@ -71,6 +71,8 @@ function updateMaterials() {
 
 function createMaterial(name) {
 	var texture_path = "assets/textures/";
+	if (CONFIG.textureQuality === 0) texture_path = "assets/textures-256/";
+	else if (CONFIG.textureQuality == 1) texture_path = "assets/textures-512/";
 	var ambient = 0xaaaaaa, diffuse = 0xaaaaaa, specular = 0xffffff, shininess = 30, scale = 1.0;
 	/*var shader = THREE.ShaderUtils.lib["normal"];
 	var uniforms = THREE.UniformsUtils.clone(shader.uniforms);

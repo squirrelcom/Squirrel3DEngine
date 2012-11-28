@@ -38,7 +38,8 @@ var CONFIG = {
 	linearTextureFilter: true,
 	bloom: true,
 	SSAO: true,
-	FXAA: false
+	FXAA: false,
+	textureQuality: 2
 };
 
 var updateConfig = function() {
