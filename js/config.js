@@ -20,7 +20,7 @@ var hashParams = (function() {
 
 var CONFIG = {
 	fullscreen: false,
-	showStats: true,
+	showStats: false,
 	resolution: 1.0,
 	physicsFPS: 60,
 	sounds: true,
