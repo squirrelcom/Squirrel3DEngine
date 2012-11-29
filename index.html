@@ -47,6 +47,7 @@
 			margin-top: 28px;
 		}
 		.red { color: red; }
+		.alert a { color: blue; }
 		#webgl-error { display: none; }
 		#firefox-warning { display: none; }
 		#angle-warning { display: none; }
@@ -103,12 +104,12 @@
 			<div id="angle-warning" class="alert">
 				<button type="button" class="close" data-dismiss="alert">×</button>
 				You may be affected by ANGLE/browser bug.<br/>
-				Try disabling <em>shadows</em> in the options and reloading the game.
+				Try disabling <em>shadows</em> in the options and reloading the game if there are missing textures.
 			</div>
 			<div id="firefox-warning" class="alert">
 				<button type="button" class="close" data-dismiss="alert">×</button>
 				You seem to be using Firefox. It has bad performance and reduced features.<br/>
-				Try reducing <em>physicsFPS</em> and <em>resolution</em> in the options or switch to Chrome.
+				Check out <a href="https://github.com/tapio/plasma-forks/wiki/Performance-Tips">Performance Tips</a> or switch to Chrome.
 			</div>
 		</div>
 
@@ -148,6 +149,18 @@
 			</div>
 
 			<div class="span6">
+				<h4>Troubleshooting</h4>
+				<p>If you experience problems, follow these steps:
+				<ol>
+					<li>Check that your system fulfills the system requirements on the left.</li>
+					<li>Read the <a href="https://github.com/tapio/plasma-forks/wiki/Known-Issues">
+						Known Issues</a> wiki page.</li>
+					<li>Check out the <a href="https://github.com/tapio/plasma-forks/wiki/Performance-Tips">
+						Performance Tips</a> wiki page if needed.</li>
+					<li>If the above didn't solve the problem, you are welcome to
+						<a href="https://github.com/tapio/plasma-forks/issues/new">file an issue</a>.</li>
+				</ol></p>
+
 				<h4>Editor</h4>
 				<p>There is also a level editor for creating and editing levels for the game.
 				For maximum productivity and minimal learning curve, the editor is 2D, but
