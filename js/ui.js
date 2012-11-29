@@ -58,6 +58,8 @@ function initUI() {
 	$("#instructions").show();
 
 	// GUI controls
+	dat.GUI.TEXT_CLOSED = 'Close Options';
+	dat.GUI.TEXT_OPEN = 'Options';
 	var gui = new dat.GUI();
 	gui.add(CONFIG, "fullscreen").onChange(updateConfig);
 	gui.add(CONFIG, "resolution", 0.1, 1.0).step(0.1).onChange(function() { updateConfig(); onWindowResize(); });
