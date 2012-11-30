@@ -24,6 +24,7 @@ var CONFIG = {
 	resolution: 1.0,
 	physicsFPS: 60,
 	sounds: true,
+	music: true,
 	postprocessing: true,
 	particles: true,
 	maxLights: 4,

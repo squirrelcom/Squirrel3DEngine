@@ -65,9 +65,15 @@ function initUI() {
 	gui.add(CONFIG, "resolution", 0.1, 1.0).step(0.1).onChange(function() { updateConfig(); onWindowResize(); });
 	gui.add(CONFIG, "physicsFPS", 30, 100).step(10).onChange(updateConfig);
 	gui.add(CONFIG, "showStats").onChange(updateConfig);
-	gui.add(CONFIG, "sounds").onChange(updateConfig);
 	gui.add(controls, "mouseFallback");
 	gui.add(window, "editLevel");
+	var guiAudio = gui.addFolder("Audio");
+	guiAudio.add(CONFIG, "sounds").onChange(updateConfig);
+	guiAudio.add(CONFIG, "music").onChange(function() {
+		if (CONFIG.music) soundManager.playMusic("dark-ambiance-01");
+		else soundManager.stopMusic();
+		updateConfig();
+	});
 	var guiRenderer = gui.addFolder("Renderer options (reload required)");
 	guiRenderer.add(CONFIG, "antialias").onChange(updateConfig);
 	guiRenderer.add(CONFIG, "physicalShading").onChange(updateConfig);

@@ -1,6 +1,7 @@
 
 function SoundManager() {
 	var sounds = {};
+	var music;
 	for (var s in assets.sounds)
 		sounds[s] = new Sound(assets.sounds[s], 5);
 
@@ -13,6 +14,17 @@ function SoundManager() {
 		var distance = pl.camera.position.distanceTo(position);
 		if (distance < radius)
 			sounds[name].play(1 - distance / radius);
+	};
+
+	this.playMusic = function(name) {
+		this.stopMusic();
+		music = new Audio("assets/music/" + name + ".ogg");
+		music.loop = true;
+		music.play();
+	};
+
+	this.stopMusic = function() {
+		if (music) music.pause();
 	};
 }
 

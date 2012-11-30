@@ -153,6 +153,8 @@ function resetLevel(levelName) {
 	soundManager = new SoundManager();
 	aiManager = new AIManager();
 	dungeon = new Dungeon(scene, pl, levelName);
+
+	if (CONFIG.music) soundManager.playMusic("dark-ambiance-01");
 }
 
 function savePlayerState(levelName) {
