@@ -158,6 +158,7 @@ function resetLevel(levelName) {
 }
 
 function savePlayerState(levelName) {
+	if (!levelName || levelName == "[credits]") return;
 	var state = {
 		hp: pl.hp,
 		bulletsPerClip: pl.bulletsPerClip,
