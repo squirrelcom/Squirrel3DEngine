@@ -33,8 +33,7 @@ function initUI() {
 	$(window).blur(pause);
 	$(window).focus(resume);
 	$("#instructions").click(function() {
-		// Firefox doesn't support fullscreenless pointer lock, so resort to this hack
-		if (CONFIG.fullscreen || /Firefox/i.test(navigator.userAgent)) {
+		if (CONFIG.fullscreen) {
 			var onFullscreenChange = function(event) {
 				if (document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.mozFullScreenElement) {
 					document.removeEventListener('fullscreenchange', onFullscreenChange);
